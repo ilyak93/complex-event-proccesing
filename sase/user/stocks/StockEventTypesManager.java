@@ -1,15 +1,15 @@
 package sase.user.stocks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import sase.base.Attribute;
 import sase.base.Datatype;
 import sase.base.Event;
 import sase.base.EventType;
 import sase.config.MainConfig;
 import sase.pattern.EventTypesManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class StockEventTypesManager extends EventTypesManager {
 
@@ -491,15 +491,17 @@ public class StockEventTypesManager extends EventTypesManager {
 	
 	@Override
 	public Object[] convertStringPayloadToObjectPayload(Object[] payload) {
-		Object[] newPayload = new Object[payload.length];
+		Object[] newPayload = new Object[payload.length-1]; //TODO: -1 because one parameter is the probability Ilya
 		newPayload[labelAttributeIndex] = payload[labelAttributeIndex];
 		newPayload[timestampAttributeIndex] = Long.valueOf((String)payload[timestampAttributeIndex]);
 		for (int i = firstStockMeasurementIndex; i < payload.length; ++i) {
 			if (payload[i] instanceof Double) {
 				newPayload[i] = payload[i];
-			}
-			else {
-				newPayload[i] = Double.valueOf((String)payload[i]);
+			} else {
+				if(String.valueOf(payload[i]).split(":")[0].equals("Prob")){ //TODO: this does the job of breaking when Prob and other (second uncertaintity) Ilya
+					break;
+				}
+				newPayload[i] = Double.valueOf((String) payload[i]);
 			}
 		}
 		return newPayload;
