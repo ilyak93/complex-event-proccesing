@@ -28,8 +28,17 @@ public class Event implements Comparable<Event> {
 		this.sequenceNumber = eventCounter++;
 		this.type = type;
 		this.systemTimestamp = System.currentTimeMillis();
-		this.payload = payload == null ? null : 
-										 EventTypesManager.getInstance().convertStringPayloadToObjectPayload(payload);
+		this.payload = payload == null ? null :
+				EventTypesManager.getInstance().convertStringPayloadToObjectPayload(payload);
+	}
+
+	public Event(EventType type, Object[] payload, double prob) {
+		this.sequenceNumber = eventCounter++;
+		this.type = type;
+		this.type.setProb(prob);
+		this.systemTimestamp = System.currentTimeMillis();
+		this.payload = payload == null ? null :
+				EventTypesManager.getInstance().convertStringPayloadToObjectPayload(payload);
 	}
 	
 	public EventType getType() {
