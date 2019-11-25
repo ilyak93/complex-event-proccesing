@@ -23,6 +23,7 @@ public class Event implements Comparable<Event> {
 	protected EventType type;
 	protected final long systemTimestamp;
 	protected Object[] payload;
+	protected double prob;
 
 	public Event(EventType type, Object[] payload) {
 		this.sequenceNumber = eventCounter++;
@@ -35,7 +36,7 @@ public class Event implements Comparable<Event> {
 	public Event(EventType type, Object[] payload, double prob) {
 		this.sequenceNumber = eventCounter++;
 		this.type = type;
-		this.type.setProb(prob);
+		this.prob = prob;
 		this.systemTimestamp = System.currentTimeMillis();
 		this.payload = payload == null ? null :
 				EventTypesManager.getInstance().convertStringPayloadToObjectPayload(payload);
@@ -91,9 +92,12 @@ public class Event implements Comparable<Event> {
 		return sequenceNumber;
 	}
 
+	public double getProb() { return prob;	}
+
+
 	@Override
 	public String toString() {
-		return String.format("%s%d:%d", type.getName(), sequenceNumber, getTimestamp());
+		return String.format("%s  %d  %d  %.2f", type.getName(), sequenceNumber, getTimestamp(), getProb());
 		/*String result = String.format("%s:", type);
 		for (int i = 0; i < payload.length; ++i) {
 			result += payload[i];
