@@ -1,13 +1,5 @@
 package sase.simulator;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 import sase.adaptive.monitoring.IAdaptationNecessityDetector;
 import sase.adaptive.monitoring.IMultiPatternAdaptationNecessityDetector;
 import sase.base.Event;
@@ -37,9 +29,19 @@ import sase.statistics.EventRateCollector;
 import sase.statistics.Statistics;
 import sase.statistics.StatisticsManager;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
 public class Simulator {
 	
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+	private static int counter = 0;
 	
 	private List<SimulationSpecification> specifications;
 	
@@ -68,7 +70,14 @@ public class Simulator {
 			Environment.getEnvironment().getEventRateEstimator().registerEventArrival(event.getType());
 		}
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.events);
+		counter++;
+
 		List<Match> matches = actuallyProcessIncomingEvent(event);
+		if(matches.size() > 0) {
+			for (Match m : matches) {
+				double cur_p = m.getMatchProb();
+			}
+		}
 		Environment.getEnvironment().getPredicateResultsCache().clear();
 		recordNewMatches(matches);
 		tryAdaptEvaluation(event.getTimestamp());
