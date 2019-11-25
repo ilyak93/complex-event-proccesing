@@ -1,8 +1,5 @@
 package sase.input;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.config.MainConfig;
@@ -16,6 +13,9 @@ import sase.user.stocks.converters.StocksByRegionEventTypesConverter;
 import sase.user.synthetic.SyntheticEventTypesConverter;
 import sase.user.traffic.AarhusTrafficEventTypesConverter;
 import sase.user.trams.TramCongestionEventTypesConverter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 
@@ -65,7 +65,13 @@ public abstract class EventProducer {
 		if (eventType == null) {
 			return false;
 		}
-		Event event = new Event(eventType, rawEvent);
+		double prob = -1;
+		for(String param : rawEvent){
+			if(param.split(":")[0].equals("Prob")){
+				prob = Double.valueOf(param.split(":")[1]);
+			}
+		}
+		Event event = new Event(eventType, rawEvent, prob);
 		pendingEvents.addAll(modifier.produceModifiedEvents(event));
 		return true;
 	}
