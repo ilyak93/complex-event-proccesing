@@ -1,13 +1,13 @@
 package sase.evaluation.common;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.EventTypesManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class EventBuffer {
 
