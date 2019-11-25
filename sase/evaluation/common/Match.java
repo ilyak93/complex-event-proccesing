@@ -1,9 +1,9 @@
 package sase.evaluation.common;
 
+import sase.base.Event;
+
 import java.util.List;
 import java.util.Objects;
-
-import sase.base.Event;
 
 public class Match {
 	private final List<Event> primitiveEvents;
@@ -45,6 +45,17 @@ public class Match {
 	
 	public long getDetectionLatency() {
 		return detectionLatency;
+	}
+
+	public double getMatchProb() {
+		double prob = 1;
+		if(this.primitiveEvents.size() == 0){
+			return 0;
+		}
+		for(Event e : this.primitiveEvents){
+			prob *= e.getType().getProb();
+		}
+		return prob;
 	}
 
 	@Override
