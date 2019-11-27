@@ -43,6 +43,8 @@ public class MainConfig {
 	
 	/* Settings for creating and managing statistics. */
 	public static String outputFilePath = pathConfig.outputFilePath;
+	public static String outputFilePathProb = pathConfig.outputFilePathProb;
+
 
 	public static final boolean periodicallyReportStatistics = false;
 	public static final int statisticsReportPeriod = 1000;
