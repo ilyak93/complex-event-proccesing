@@ -29,6 +29,7 @@ import sase.statistics.EventRateCollector;
 import sase.statistics.Statistics;
 import sase.statistics.StatisticsManager;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,14 +38,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import au.com.bytecode.opencsv.CSVWriter;
+
 public class Simulator {
-	
+
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
 	private static int counter = 0;
-	
+
 	private List<SimulationSpecification> specifications;
-	
+
 	private IWorkloadManager workload;
 	private Long timeWindow;
     private EventProducer eventProducer;
@@ -52,19 +55,21 @@ public class Simulator {
 
     private IEvaluationMechanism primaryEvaluationMechanism;
     private IEvaluationMechanism secondaryEvaluationMechanism;
-    
+
     private Long lastAdaptCheckTimestamp;
     private Long secondaryEvaluationMechanismCreationTimestamp;
-    
+
     private SimulationHistory simulationHistory = new SimulationHistory();
 	private String currentHistoryId = null;
     private StatisticsManager oldStatisticsManager = null;
-    
+
     private int currentStepNumber = 0;
-    
+
+	private CSVWriter writer;
+
 	private void processIncomingEvent(Event event) {
 		if (MainConfig.eventRateMeasurementMode) {
-    		eventRateEstimator.recordEvent(event);
+			eventRateEstimator.recordEvent(event);
 		}
 		if (MainConfig.isArrivalRateMonitoringAllowed) {
 			Environment.getEnvironment().getEventRateEstimator().registerEventArrival(event.getType());
@@ -76,6 +81,9 @@ public class Simulator {
 		if(matches.size() > 0) {
 			for (Match m : matches) {
 				double cur_p = m.getMatchProb();
+				String[] events={m.getPrimitiveEvents().toString(),String.valueOf(cur_p)};
+			//	String[] parts = m.getPrimitiveEvents().toString().split(",") ;
+				writer.writeNext(events);
 			}
 		}
 		Environment.getEnvironment().getPredicateResultsCache().clear();
@@ -96,13 +104,13 @@ public class Simulator {
 		addIfNotNull(processNewEventOnEvaluationMechanism(secondaryEvaluationMechanism, event, true), matches);
 		return matches;
 	}
-	
+
 	private void addIfNotNull(List<Match> listToAdd, List<Match> listToAddTo) {
 		if (listToAdd != null) {
 			listToAddTo.addAll(listToAdd);
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private List<Match> processNewEventOnEvaluationMechanism(IEvaluationMechanism mechanism,
 															 Event event, boolean canStartInstance) {
@@ -123,7 +131,7 @@ public class Simulator {
 		}
 		return matches;
 	}
-	
+
 	private void tryAdaptEvaluation(long currentTimestamp) {
 		if (secondaryEvaluationMechanism != null) {
 			if (currentTimestamp - secondaryEvaluationMechanismCreationTimestamp > timeWindow) {
@@ -164,7 +172,7 @@ public class Simulator {
 		}
 		Environment.getEnvironment().getStatisticsManager().stopMeasuringTime(Statistics.adaptationTime);
 	}
-	
+
 	private void tryModifyWorkload(long currentTimestamp) {
 		if (!(primaryEvaluationMechanism instanceof IMultiPatternEvaluationMechanism)) {
 			return;
@@ -178,12 +186,12 @@ public class Simulator {
 		}
 		createSecondaryEvaluationMechanism(currentTimestamp);
 	}
-	
+
 	private void createSecondaryEvaluationMechanism(long currentTimestamp) {
 		secondaryEvaluationMechanism = createNewEvaluationMechanism(primaryEvaluationMechanism);
 		secondaryEvaluationMechanismCreationTimestamp = currentTimestamp;
 	}
-	
+
 	private void updateColoredPatterns(IMultiPatternEvaluationMechanism evaluationMechanism,
 									   IMultiPatternAdaptationNecessityDetector detector) {
 		Set<CompositePattern> affectedPatterns = detector.getAffectedPatterns();
@@ -197,10 +205,10 @@ public class Simulator {
 	private IEvaluationMechanism createNewEvaluationMechanism() {
 		return createNewEvaluationMechanism(null);
 	}
-	
+
 	private IEvaluationMechanism createNewEvaluationMechanism(IEvaluationMechanism currentEvaluationMechanism) {
     	Environment.getEnvironment().getStatisticsManager().startMeasuringTime(Statistics.evaluationMechanismCreationTime);
-    	Object evaluationMechanismObject = 
+    	Object evaluationMechanismObject =
     		EvaluationMechanismFactory.createEvaluationMechanism(workload.getCurrentWorkload(), currentEvaluationMechanism);
     	Environment.getEnvironment().getStatisticsManager().stopMeasuringTime(Statistics.evaluationMechanismCreationTime);
     	IEvaluationMechanism evaluationMechanism = (IEvaluationMechanism)evaluationMechanismObject;
@@ -214,7 +222,7 @@ public class Simulator {
     	Environment.getEnvironment().setEvaluationMechanismInfo((IEvaluationMechanismInfo)evaluationMechanismObject);
     	return evaluationMechanism;
 	}
-	
+
 	private void recordNewMatches(List<Match> matches) {
 		if (matches == null) {
 			return;
@@ -225,10 +233,10 @@ public class Simulator {
 			Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.matches);
 		}
 	}
-	
+
 	private void attemptToRecoverExistingStatistics(SimulationSpecification currentSpecification) {
-		currentHistoryId = String.format("%s|%s", 
- 				 						 currentSpecification.getWorkloadSpecification().getShortDescription(), 
+		currentHistoryId = String.format("%s|%s",
+ 				 						 currentSpecification.getWorkloadSpecification().getShortDescription(),
  				 						 primaryEvaluationMechanism.getStructureSummary());
 		oldStatisticsManager = simulationHistory.getStatisticsManagerForSimulation(currentHistoryId);
 		if (oldStatisticsManager == null) {
@@ -236,33 +244,33 @@ public class Simulator {
 		}
 		oldStatisticsManager.setRunDescription(Environment.getEnvironment().getStatisticsManager().getRunDescription());
 		oldStatisticsManager.replaceDiscreteStatistic(
-				Statistics.evaluationMechanismCreationTime, 
+				Statistics.evaluationMechanismCreationTime,
 				Environment.getEnvironment().getStatisticsManager().getDiscreteStatistic(
 																			Statistics.evaluationMechanismCreationTime));
 	}
 
     private void prepareNextEvaluationStep(SimulationSpecification currentSpecification) throws Exception {
-    	System.out.println(String.format("Running Simulation Step %d/%d %s\n%s", 
-    									 ++currentStepNumber, specifications.size(), 
+    	System.out.println(String.format("Running Simulation Step %d/%d %s\n%s",
+    									 ++currentStepNumber, specifications.size(),
     									 dateFormat.format(new Date()), currentSpecification));
-    	
+
     	workload = PatternWorkloadFactory.createPatternWorkload(currentSpecification.getWorkloadSpecification(),
     										    				currentSpecification.getInputSpecification());
     	Environment.getEnvironment().reset(workload, currentSpecification);
     	timeWindow = workload.getMaxTimeWindow();
-    	
+
     	eventProducer = EventProducerFactory.createEventProducer(workload.getCurrentWorkload(), currentSpecification);
-    	
+
     	primaryEvaluationMechanism = createNewEvaluationMechanism();
     	secondaryEvaluationMechanism = null;
     	lastAdaptCheckTimestamp = null;
-    	
+
     	eventRateEstimator = new EventRateCollector(EventTypesManager.getInstance().getKnownEventTypes(), timeWindow);
     	if (MainConfig.useSimulationHistory) {
     		attemptToRecoverExistingStatistics(currentSpecification);
     	}
     }
-    
+
     private void runEvaluationStep() throws IOException {
     	if (oldStatisticsManager != null) {
     		oldStatisticsManager.reportStatistics();
@@ -305,7 +313,7 @@ public class Simulator {
 			}
     	}
     }
-    
+
     private void cleanupEvaluationStep() {
     	eventProducer.finish();
     	Event.resetCounter();
@@ -317,7 +325,7 @@ public class Simulator {
     	}
     	System.gc();
     }
-    
+
     private SimulationSpecification[] generateSpecifications() {
     	ISimulationSpecificationCreator specificationCreator = SpecificationCreatorFactory.createSpecificationCreator();
     	if (specificationCreator == null) {
@@ -325,7 +333,7 @@ public class Simulator {
     	}
     	return specificationCreator.createSpecifications();
     }
-    
+
     private List<SimulationSpecification> createSpecificationsForTimeWindows(SimulationSpecification specification) {
 		WorkloadSpecification workloadSpecification = specification.getWorkloadSpecification();
     	if (SimulationConfig.timeWindows.length == 0 || workloadSpecification.getMaxTimeWindow() != null ||
@@ -333,27 +341,27 @@ public class Simulator {
 			return null;
 		}
     	List<SimulationSpecification> result = new ArrayList<SimulationSpecification>();
-		PatternSpecification patternSpecification = 
+		PatternSpecification patternSpecification =
 				((SinglePatternWorkloadSpecification)workloadSpecification).getPatternSpecification();
 		for (long timeWindow : SimulationConfig.timeWindows) {
 			long actualTimeWindow = (patternSpecification.getIteratedEventNames().length == 0) ?
 									 timeWindow : timeWindow * 2 / 5;
-			PatternSpecification newPatternSpecification = 
-					new PatternSpecification(patternSpecification.getName(), 
-											 patternSpecification.getType(), 
+			PatternSpecification newPatternSpecification =
+					new PatternSpecification(patternSpecification.getName(),
+											 patternSpecification.getType(),
 											 actualTimeWindow,
 											 patternSpecification.getStructure(),
 											 patternSpecification.getNegatedEventNames(),
 											 patternSpecification.getIteratedEventNames(),
 											 patternSpecification.getConditions(),
 											 patternSpecification.getVerifierType());
-			SinglePatternWorkloadSpecification newWorkloadSpecification = 
+			SinglePatternWorkloadSpecification newWorkloadSpecification =
 					new SinglePatternWorkloadSpecification(newPatternSpecification);
 			result.add(new SimulationSpecification(newWorkloadSpecification, specification.getEvaluationSpecification()));
 		}
 		return result;
     }
-	
+
 	private void start() {
 		specifications = new ArrayList<SimulationSpecification>();
 		SimulationSpecification[] baseSpecifications = generateSpecifications();
@@ -367,7 +375,7 @@ public class Simulator {
 			}
 		}
     }
-	
+
 	private void runEvaluation() {
 		for (SimulationSpecification specification : specifications) {
 			try {
@@ -380,20 +388,45 @@ public class Simulator {
 			}
 		}
 	}
-	
+
 	private void finish() {
     	Environment.getEnvironment().destroy();
     	if (MainConfig.conditionSelectivityMeasurementMode) {
     		ConditionSelectivityCollector.getInstance().serializeSelectivityEstimates();
     	}
     }
-	
+
+	private static CSVWriter initProbCSV() throws IOException {
+		CSVWriter writer;
+		try {
+			writer = new CSVWriter(new FileWriter(MainConfig.outputFilePathProb));
+		} catch (IOException e) {
+			System.out.println(String.format("Failed to open output file %s: %s",
+					MainConfig.outputFilePathProb, e.getMessage()));
+			throw e;
+		}
+		String[] headLine={"SEQ [Name  sequenceNumber  Timestamp  Prob,...]","Prob"};
+		writer.writeNext(headLine);
+		return writer;
+	}
+
 	private void execute() {
+		try {
+			writer=initProbCSV();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		start();
 		runEvaluation();
 		finish();
+		try {
+			writer.close();
+		} catch (IOException e) {
+			System.out.println(String.format("Failed to close output file %s: %s",
+					MainConfig.outputFilePathProb, e.getMessage()));
+		}
 	}
-	
+
 	public static void main(String [] args) {
 		if (args.length != 0 && args.length != 2) {
 			throw new RuntimeException("Illegal arguments number");
