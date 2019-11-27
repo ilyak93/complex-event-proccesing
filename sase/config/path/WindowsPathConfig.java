@@ -4,10 +4,11 @@ public class WindowsPathConfig extends PathConfig {
 
 	public WindowsPathConfig() {
 		companyToRegionDirectoryPath = "Regions";
-		testInputFilePath = "";
+		testInputFilePath = "testInputFile";
 		firstInputFilePath = "NASDAQ_20080204_1.txt";
-		firstInputDirectoryPath = "";
+		firstInputDirectoryPath = "input_dir_path";
 		outputFilePath = "output.csv";
+		outputFilePathProb = "outputProb.csv";
 		selectivityEstimatorsFilePath = "selectivity.ser";
 	}
 }

@@ -7,5 +7,6 @@ public abstract class PathConfig {
 	public String firstInputFilePath;
 	public String firstInputDirectoryPath;
 	public String outputFilePath;
+	public String outputFilePathProb;
 	public String selectivityEstimatorsFilePath;
 }
