@@ -9,7 +9,6 @@ public class EventType {
 
 	private final String name;
 	private final List<Attribute> attributes;
-	private static double prob;
 
 	public EventType(String name, Attribute[] attributes) {
 		this.name = name;
@@ -31,14 +30,6 @@ public class EventType {
 		return Environment.getEnvironment().getEventRateEstimator().getEventRateEstimate(this);
 	}
 
-	public double getProb() {
-		return this.prob;
-	}
-
-	public void setProb(double prob) {
-		this.prob = prob;
-	}
-	
 	@Override
 	public String toString() {
 		return getName();
