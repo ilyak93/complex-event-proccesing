@@ -1,7 +1,5 @@
 package sase.evaluation.nfa.eager.elements;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.evaluation.common.EventBuffer;
@@ -10,12 +8,16 @@ import sase.evaluation.nfa.NFA;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
 
+import java.util.List;
+
 public class Instance {
 	protected final NFA automaton;
 	protected NFAState currentState;
 	protected EventBuffer matchBuffer;
+	protected double matchProbability; // TODO: update it everywhere is needed
 	private boolean shouldGenerateInputBufferReadyEvent;
 	private boolean shouldInvalidate;
+
 
 	public Instance(NFA nfa, NFAState initialState) {
 		this(nfa, initialState, null);
