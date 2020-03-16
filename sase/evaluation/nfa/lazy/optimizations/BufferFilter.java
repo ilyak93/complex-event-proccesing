@@ -1,9 +1,5 @@
 package sase.evaluation.nfa.lazy.optimizations;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.evaluation.nfa.lazy.elements.LazyInstance;
@@ -11,6 +7,10 @@ import sase.pattern.condition.Condition;
 import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
 import sase.pattern.condition.iteration.lazy.IteratedFilterCondition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class BufferFilter extends BufferPreprocessor {
 	
@@ -26,15 +26,17 @@ public class BufferFilter extends BufferPreprocessor {
 			}
 		}
 		
-		public boolean applyFilter(Event eventToFilter) {
+		public Double applyFilter(Event eventToFilter) { //TODO: make sue with Ilya what is that
+			Double filterConditionProb = 1.0;
 			for (AtomicCondition atomicCondition : filterCondition.getAtomicConditions()) {
 				IteratedFilterCondition atomicFilterCondition = (IteratedFilterCondition)atomicCondition;
 				Event externalEventToVerifyWith = conditionToExternalEvent.get(atomicFilterCondition);
-				if (!atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith)) {
-					return false;
-				}
+				Double currentFilterConditionProb = atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith);
+				if (currentFilterConditionProb > 0.0) {
+					filterConditionProb *= currentFilterConditionProb;
+				} else return 0.0;
 			}
-			return true;
+			return filterConditionProb;
 		}
 	};
 
@@ -48,16 +50,21 @@ public class BufferFilter extends BufferPreprocessor {
 			conditionToType.put(atomicFilterCondition, atomicFilterCondition.getRightEventType());
 		}
 	}
-	
+
+	//TODO:: to check how it should work in non deterministic way and fix code appropriately
 	@Override
 	public List<Event> preprocessEvents(LazyInstance instance, List<Event> events, boolean isLastPreprocessor) {
 		List<Event> filteredEvents = new ArrayList<Event>();
 		Activator filterActivator = new Activator(instance);
+		Double preprocessConditionsProb = 1.0;
 		for (Event event : events) {
-			if (filterActivator.applyFilter(event)) {
+			Double currentPreprocessConditionsProb = 1.0;
+			if (currentPreprocessConditionsProb > 0.0) {
 				filteredEvents.add(event);
+				preprocessConditionsProb *= currentPreprocessConditionsProb;
 			}
 		}
+		instance.updateProb(preprocessConditionsProb);
 		if (isLastPreprocessor) {
 			return BufferPreprocessor.createAggregatedEventsFromBufferedEvents(filteredEvents);
 		}

@@ -60,8 +60,13 @@ public class Transition {
 	public Condition getCondition() {
 		return condition;
 	}
-	
+
+	/*
 	public boolean verifyCondition(List<Event> events) {
+		return condition.verify(events);
+	}
+	*/
+	public Double verifyCondition(List<Event> events) {
 		return condition.verify(events);
 	}
 	

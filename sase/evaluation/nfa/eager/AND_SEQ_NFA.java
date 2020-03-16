@@ -1,10 +1,5 @@
 package sase.evaluation.nfa.eager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventSelectionStrategies;
 import sase.base.EventType;
@@ -15,8 +10,8 @@ import sase.evaluation.nfa.eager.elements.NFAState;
 import sase.evaluation.nfa.eager.elements.Transition;
 import sase.evaluation.nfa.lazy.elements.EfficientInputBuffer;
 import sase.pattern.Pattern;
-import sase.pattern.UnaryPattern;
 import sase.pattern.Pattern.PatternOperatorTypes;
+import sase.pattern.UnaryPattern;
 import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
 import sase.pattern.condition.base.TrivialCondition;
@@ -27,6 +22,11 @@ import sase.pattern.condition.iteration.eager.IterationTriggerCondition;
 import sase.pattern.condition.time.PairTemporalOrderCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AND_SEQ_NFA extends AND_NFA {
 
@@ -266,7 +266,7 @@ public class AND_SEQ_NFA extends AND_NFA {
 		conditionToVerify.addAtomicConditions(negativeTemporalConditions.get(negativeEventType));
 		for (Event negativeEvent : negatedEventsBuffer.getTypeBuffer(negativeEventType)) {
 			positiveEvents.add(0, negativeEvent);
-			if (conditionToVerify.verify(positiveEvents)) {
+			if (conditionToVerify.verify(positiveEvents) <= 0.0) {
 				//negative event found - we should invalidate this match
 				return false;
 			}

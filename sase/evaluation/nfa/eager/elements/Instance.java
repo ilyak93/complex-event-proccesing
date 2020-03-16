@@ -27,11 +27,20 @@ public class Instance {
 		automaton = nfa;
 		currentState = initialState;
 		matchBuffer = eventBuffer == null ? new EventBuffer(automaton.getIterativeTypes()) : eventBuffer.clone();
+		matchProbability = 1.0;
 		shouldGenerateInputBufferReadyEvent = false;
 		shouldInvalidate = false;
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteMemoryStatistic(Statistics.instanceCreations);
 	}
 	
+	public Double getProb() {
+		return this.matchProbability;
+	}
+
+	public void updateProb(Double newProb) {
+		this.matchProbability *= newProb;
+	}
+
 	public NFAState getCurrentState() {
 		return currentState;
 	}
@@ -80,15 +89,15 @@ public class Instance {
 	public boolean isExpired() {
 		return isExpired(0);
 	}
-	
-	public boolean isTransitionPossible(Event event, Transition transition) {
+
+	public Double isTransitionPossible(Event event, Transition transition) {
 		if (event.getType() != transition.getEventType())
-			return false;
+			return -1.0;
 		EventBuffer bufferOfEventsToVerify = matchBuffer.clone();
 		bufferOfEventsToVerify.addEvent(event);
 		return transition.verifyCondition(bufferOfEventsToVerify.getEvents());
 	}
-	
+
 	protected void executeMatchBufferTransition(Event event) {
 		matchBuffer.addEvent(event);
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteMemoryStatistic(Statistics.bufferInsertions);

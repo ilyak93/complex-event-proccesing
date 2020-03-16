@@ -1,8 +1,5 @@
 package sase.evaluation.nfa.lazy.elements;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.config.MainConfig;
@@ -16,6 +13,9 @@ import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
 import sase.pattern.condition.iteration.eager.IterationTriggerCondition;
 import sase.pattern.condition.time.EventTemporalPositionCondition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LazyTransition extends Transition {
 	
@@ -97,8 +97,13 @@ public class LazyTransition extends Transition {
 	}
 	
 	@Override
-	public boolean verifyCondition(List<Event> events) {
-		return super.verifyCondition(events) && (temporalCondition == null || temporalCondition.verify(events));
+	public Double verifyCondition(List<Event> events) {
+		Double condProb = super.verifyCondition(events);
+		Double temporalCondProb = 1.0;
+		if(temporalCondition != null){
+			temporalCondProb = temporalCondition.verify(events);
+		}
+		return condProb*temporalCondProb;
 	}
 	
 	@Override

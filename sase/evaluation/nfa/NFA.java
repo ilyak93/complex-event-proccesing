@@ -1,14 +1,6 @@
 package sase.evaluation.nfa;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import sase.base.Attribute;
-import sase.base.Datatype;
-import sase.base.Event;
-import sase.base.EventSelectionStrategies;
-import sase.base.EventType;
+import sase.base.*;
 import sase.config.MainConfig;
 import sase.evaluation.IEvaluationMechanism;
 import sase.evaluation.IEvaluationMechanismInfo;
@@ -25,6 +17,10 @@ import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismInfo {
 
@@ -105,10 +101,12 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 	private List<Instance> processNewEventOnInstance(Event event, Instance instance) {
 		List<Instance> newInstances = new ArrayList<Instance>();
 		for (Transition transition : instance.getCurrentState().getOutgoingTransitions()) {
-			if (!(instance.isTransitionPossible(event, transition)))
+			Double transitionProb = instance.isTransitionPossible(event, transition);
+			if (transitionProb <= 0.0)
 				continue;
 
 			Instance newInstance = instance.clone();
+			newInstance.updateProb(transitionProb);
 			newInstances.add(newInstance);
 			newInstance.executeTransition(event, transition);
 			newInstances.addAll(executeEmptyTransitions(newInstance));
@@ -222,6 +220,7 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 		// regardless of success
 		if (actualMatch != null && instance.shouldReportMatch()) {
 			// an actual match was detected
+			actualMatch.updateMatchConditionsProb(instance.getProb());
 			listOfMatches.add(actualMatch);
 		}
 		if (listOfInstancesToBeRemoved != null && instance.shouldDiscardWithMatch()) {

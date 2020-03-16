@@ -1,10 +1,5 @@
 package sase.evaluation.nfa.lazy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventSelectionStrategies;
@@ -29,6 +24,11 @@ import sase.pattern.condition.time.EventTemporalPositionCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class LazyNFA extends NFA {
 
 	protected NFAState rejectingState = null;
@@ -51,9 +51,9 @@ public abstract class LazyNFA extends NFA {
 		return rejectingState;
 	}
 	
-	public boolean verifyContiguityConditions(Event firstEvent, Event secondEvent) {
+	public Double verifyContiguityConditions(Event firstEvent, Event secondEvent) {
 		if (contiguityVerifier == null) {
-			return true;
+			return 1.0;
 		}
 		return contiguityVerifier.verify(Arrays.asList(new Event[] {firstEvent, secondEvent}));
 	}
@@ -258,15 +258,18 @@ public abstract class LazyNFA extends NFA {
 	private List<LazyInstance> attemptTransitionOnInstance(Event event, LazyInstance instance,
 			LazyTransition transition) {
 		List<LazyInstance> newInstances = new ArrayList<LazyInstance>();
-		if (!(instance.isTransitionPossible(event, transition)))
+		Double transition_prob = instance.isTransitionPossible(event, transition);
+		if (transition_prob <= 0.0)
 			return newInstances;
 
 		boolean shouldCloneInstance = transition.shouldCloneInstance();
 		LazyInstance immediateTransitionInstance;
 		if (shouldCloneInstance) {
 			immediateTransitionInstance = instance.clone();
+			immediateTransitionInstance.updateProb(transition_prob);
 		} else {
 			immediateTransitionInstance = instance;
+			immediateTransitionInstance.updateProb(transition_prob);
 		}
 		immediateTransitionInstance.executeTransition(event, transition);
 		boolean hasFinishedWithMatch = immediateTransitionInstance.getCurrentState().isAccepting();
