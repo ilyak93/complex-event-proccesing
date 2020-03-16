@@ -1,9 +1,6 @@
 package sase.user.stocks;
 
-import sase.base.Attribute;
-import sase.base.Datatype;
-import sase.base.Event;
-import sase.base.EventType;
+import sase.base.*;
 import sase.config.MainConfig;
 import sase.pattern.EventTypesManager;
 
@@ -496,7 +493,9 @@ public class StockEventTypesManager extends EventTypesManager {
 		newPayload[timestampAttributeIndex] = Long.valueOf((String)payload[timestampAttributeIndex]);
 		for (int i = firstStockMeasurementIndex; i < payload.length; ++i) {
 			if (payload[i] instanceof Double) {
-				newPayload[i] = payload[i];
+				newPayload[i] = new DeterministicPayload((String)(payload[i]));
+			} else if(((String)payload[i]).charAt(0) == '['){
+				newPayload[i] = new DiscreteDistributionPayload((String)(payload[i]));
 			} else {
 				if(String.valueOf(payload[i]).split(":")[0].equals("Prob")){ //TODO: this does the job of breaking when Prob and other (second uncertaintity) Ilya
 					break;

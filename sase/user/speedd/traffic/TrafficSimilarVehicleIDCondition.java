@@ -17,10 +17,12 @@ public class TrafficSimilarVehicleIDCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
 		Long firstID = (Long) firstEvent.getAttributeValue(TrafficEventTypesManager.vehicleIDAttributeIndex);
 		Long secondID = (Long) secondEvent.getAttributeValue(TrafficEventTypesManager.vehicleIDAttributeIndex);
-		return Math.abs(firstID - secondID) <= maxDiff;
+		//return Math.abs(firstID - secondID) <= maxDiff;
+		//TODO: use our functions and types
+		return 1.0;
 	}
 
 	@Override

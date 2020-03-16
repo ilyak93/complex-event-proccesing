@@ -1,7 +1,5 @@
 package sase.user.synthetic;
 
-import java.util.Random;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.input.producers.ISyntheticSelectivityProvider;
@@ -24,7 +22,7 @@ public class SyntheticCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
 		if (selectivityProvider == null) {
 			throw new RuntimeException("The selectivity provider was not set yet.");
 		}
@@ -35,7 +33,9 @@ public class SyntheticCondition extends DoubleEventCondition {
 			}
 		}
 		double currentSelectivity = selectivityProvider.getSelectivity(id, firstEvent, secondEvent);
-		return (new Random().nextDouble() < currentSelectivity);
+		//return (new Random().nextDouble() < currentSelectivity);
+		//TODO: use our types and functions
+		return 1.0;
 	}
 
 	@Override

@@ -49,20 +49,26 @@ public class StockFirstValueCmpCondition extends DoubleEventCondition {
 	}
 	
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
 		int firstEventValue = ((Double)getStockFirstValue(firstEvent)).intValue();
 		int secondEventValue = ((Double)getStockFirstValue(secondEvent)).intValue();
 		switch (operation) {
 		case BIGGER:
-			return (firstEventValue > secondEventValue);
+			//return (firstEventValue > secondEventValue);
+			return 1.0;
+			// TODO: use our types and functions
 		case EQUALS:
-			return (firstEventValue == secondEventValue);
+			//return (firstEventValue == secondEventValue);
+			return 1.0;
+			// TODO: use our types and functions
 		case SMALLER:
-			return (firstEventValue < secondEventValue);
+			//return (firstEventValue < secondEventValue);
+			return 1.0;
+			// TODO: use our types and functions
 		case ANY:
-			return true;
+			return 1.0;
 		default:
-			return false;
+			return 0.0;
 		}
 	}
 	

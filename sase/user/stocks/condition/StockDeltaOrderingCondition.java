@@ -1,11 +1,13 @@
 package sase.user.stocks.condition;
 
-import java.util.Objects;
-
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
+import sase.base.PayloadFunctional;
 import sase.pattern.condition.base.DoubleEventCondition;
 import sase.user.stocks.StockEventTypesManager;
+
+import java.util.Objects;
 
 public class StockDeltaOrderingCondition extends DoubleEventCondition {
 
@@ -17,15 +19,20 @@ public class StockDeltaOrderingCondition extends DoubleEventCondition {
 		super(firstType, secondType);
 	}
 	
-	private Double calculateDelta(Event event) {
-		Double firstValue = (Double)event.getAttributeValue(StockEventTypesManager.firstStockMeasurementIndex);
-		Double secondValue = (Double)event.getAttributeValue(StockEventTypesManager.firstStockMeasurementIndex + 1);
-		return Math.abs(firstValue - secondValue);
+	private Payload calculateDelta(Event event) { //TODO: use our type
+		Payload firstValue = (Payload)event.getAttributeValue(
+				StockEventTypesManager.firstStockMeasurementIndex);
+		Payload secondValue = (Payload)event.getAttributeValue(
+				StockEventTypesManager.firstStockMeasurementIndex + 1);
+		return PayloadFunctional.abs(PayloadFunctional.substract(
+				firstValue,secondValue));
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
-		return calculateDelta(firstEvent) < calculateDelta(secondEvent);
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+		Payload a = calculateDelta(firstEvent);
+		Payload b = calculateDelta(secondEvent);
+		return PayloadFunctional.lessThen(a, b); //TODO: use our function and type
 	}
 	
 	@Override
