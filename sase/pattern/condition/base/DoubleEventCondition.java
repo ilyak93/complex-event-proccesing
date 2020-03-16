@@ -1,12 +1,12 @@
 package sase.pattern.condition.base;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.config.MainConfig;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.List;
 
 /**
  * Represents a condition which involves attributes of a pair of primitive events.
@@ -34,7 +34,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events) {
 		Event firstEvent = null;
 		Event secondEvent = null;
 		for (Event event : events) {
@@ -47,7 +47,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 				return verifyDoubleEvent(firstEvent, secondEvent);
 			}
 		}
-		return false;
+		return 0.0;
 	}
 	
 	public EventType getLeftEventType() {
@@ -63,5 +63,5 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 		return String.format("%s:%s", firstType.getName(), secondType.getName());
 	}
 	
-	protected abstract boolean verifyDoubleEvent(Event firstEvent, Event secondEvent);
+	protected abstract Double verifyDoubleEvent(Event firstEvent, Event secondEvent);
 }

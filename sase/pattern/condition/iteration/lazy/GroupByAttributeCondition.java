@@ -1,11 +1,11 @@
 package sase.pattern.condition.iteration.lazy;
 
-import java.util.List;
-
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.iteration.IteratedEventInternalCondition;
+
+import java.util.List;
 
 public class GroupByAttributeCondition extends IteratedEventInternalCondition {
 
@@ -17,19 +17,21 @@ public class GroupByAttributeCondition extends IteratedEventInternalCondition {
 	}
 
 	@Override
-	protected boolean verifyAggregatedEvent(AggregatedEvent event) {
+	protected Double verifyAggregatedEvent(AggregatedEvent event) {
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return true;
+			return 1.0;
 		}
 		Object attributeValue = primitiveEvents.get(0).getAttributeValue(attributeIndex);
+		Double aggregatedProb = 1.0;
 		for (int i = 1; i < primitiveEvents.size(); ++i) {
-			Object valueToCompare = primitiveEvents.get(i).getAttributeValue(attributeIndex);
-			if (!attributeValue.equals(valueToCompare)) {
-				return false;
-			}
+			Object valueToCompare = primitiveEvents.get(i).getAttributeValue(attributeIndex);//TODO: use our types and functions
+			Double curPrimitiveEventConditionProb = 1.0; //attributeValue.equals(valueToCompare);
+			if(curPrimitiveEventConditionProb > 0.0){
+				aggregatedProb *= curPrimitiveEventConditionProb;
+			} else return 0.0;
 		}
-		return true;
+		return aggregatedProb;
 	}
 
 	public int getAttributeIndex() {

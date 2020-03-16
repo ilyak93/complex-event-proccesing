@@ -1,10 +1,10 @@
 package sase.pattern.condition.iteration.eager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.pattern.condition.base.DoubleEventCondition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class IteratedIncrementalDoubleEventCondition extends IteratedIncrementalCondition {
 	
@@ -16,7 +16,7 @@ public class IteratedIncrementalDoubleEventCondition extends IteratedIncremental
 	}
 
 	@Override
-	public boolean verifyAdjacentEvents(Event firstEvent, Event secondEvent) {
+	public Double verifyAdjacentEvents(Event firstEvent, Event secondEvent) {
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(firstEvent);
 		eventsToVerify.add(secondEvent);

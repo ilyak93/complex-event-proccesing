@@ -21,8 +21,9 @@ public class PairwiseContiguityCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
-		return (firstEvent.getSequenceNumber() == secondEvent.getSequenceNumber() - difference);
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+		Double result = (double)(firstEvent.getSequenceNumber() - (secondEvent.getSequenceNumber() - difference));
+		return result == 0.0 ? 1.0 : 0.0;
 	}
 
 	@Override

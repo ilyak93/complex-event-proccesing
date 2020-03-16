@@ -1,10 +1,10 @@
 package sase.pattern.condition.time;
 
-import java.util.Objects;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.base.DoubleEventCondition;
+
+import java.util.Objects;
 
 /**
  * Represents a condition enforcing a temporal order on a pair of events.
@@ -16,8 +16,9 @@ public class PairTemporalOrderCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
-		return firstEvent.getSequenceNumber() < secondEvent.getSequenceNumber();
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+		if(firstEvent.getSequenceNumber() < secondEvent.getSequenceNumber()) return 1.0;
+		return 0.0;
 	}
 	
 	@Override

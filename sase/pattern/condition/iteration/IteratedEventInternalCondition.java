@@ -16,7 +16,7 @@ public abstract class IteratedEventInternalCondition extends SingleEventConditio
 	}
 
 	@Override
-	protected boolean verifySingleEvent(Event event) {
+	protected Double verifySingleEvent(Event event) {
 		if (!(event instanceof AggregatedEvent)) {
 			throw new RuntimeException(
 				String.format("Aggregated event of type %s expected, primitive event %s received instead", type, event));
@@ -25,6 +25,6 @@ public abstract class IteratedEventInternalCondition extends SingleEventConditio
 		return verifyAggregatedEvent(aggregatedEvent);
 	}
 	
-	protected abstract boolean verifyAggregatedEvent(AggregatedEvent event);
+	protected abstract Double verifyAggregatedEvent(AggregatedEvent event);
 
 }

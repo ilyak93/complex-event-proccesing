@@ -1,11 +1,11 @@
 package sase.pattern.condition.base;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.List;
 
 /**
  * Represents a condition which only involves attributes of a single primitive event.
@@ -21,19 +21,19 @@ public abstract class SingleEventCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events) {
 		for (Event event : events) {
 			if (event.getType() == type) {
 				Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.computations);
 				return verifySingleEvent(event);
 			}
 		}
-		return false;
+		return 0.0;
 	}
 	
 	public EventType getType() {
 		return type;
 	}
 
-	protected abstract boolean verifySingleEvent(Event event);
+	protected abstract Double verifySingleEvent(Event event);
 }

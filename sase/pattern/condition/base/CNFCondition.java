@@ -1,13 +1,13 @@
 package sase.pattern.condition.base;
 
+import sase.base.Event;
+import sase.base.EventType;
+import sase.pattern.condition.Condition;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-
-import sase.base.Event;
-import sase.base.EventType;
-import sase.pattern.condition.Condition;
 
 /**
  * Represents a condition in a format of a CNF formula, containing a conjunction of multiple atomic conditions.
@@ -58,7 +58,7 @@ public class CNFCondition extends Condition {
 				eventTypes.add(eventType);
 		}
 	}
-	
+	/*
 	@Override
 	public boolean verify(List<Event> events) {
 		for (AtomicCondition condition : atomicConditions) {
@@ -66,6 +66,17 @@ public class CNFCondition extends Condition {
 				return false;
 		}
 		return true;
+	}
+	*/
+	@Override
+	public Double verify(List<Event> events) {
+		Double condProb = 1.0;
+		for (AtomicCondition condition : atomicConditions) {
+			Double current_condition_prob = condition.verify(events);;
+			if(current_condition_prob <= 0.0) return current_condition_prob;
+			condProb *= current_condition_prob;
+		}
+		return condProb;
 	}
 	
 	public List<AtomicCondition> getAtomicConditions() {

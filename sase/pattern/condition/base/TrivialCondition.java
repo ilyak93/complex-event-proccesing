@@ -1,8 +1,8 @@
 package sase.pattern.condition.base;
 
-import java.util.List;
-
 import sase.base.Event;
+
+import java.util.List;
 
 /**
  * Represents an empty condition which is always satisfied.
@@ -10,8 +10,8 @@ import sase.base.Event;
 public class TrivialCondition extends AtomicCondition {
 
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
-		return true;
+	protected Double actuallyVerify(List<Event> events) {
+		return 1.0;
 	}
 	
 	@Override

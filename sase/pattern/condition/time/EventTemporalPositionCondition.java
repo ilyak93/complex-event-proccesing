@@ -1,12 +1,12 @@
 package sase.pattern.condition.time;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.base.AtomicCondition;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class EventTemporalPositionCondition extends AtomicCondition {
 
@@ -48,23 +48,23 @@ public class EventTemporalPositionCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events) {
 		Event targetEvent = getEventByType(events, targetEventType);
 		if (targetEvent == null)
 			throw new RuntimeException("Cannot verify condition - the target event was not found.");
 		for (EventType eventType : precedingEventTypes) {
 			Event precedingEvent = getEventByType(events, eventType);
 			if (isEarlier(targetEvent, precedingEvent)) {
-				return false;
+				return 0.0;
 			}
 		}
 		for (EventType eventType : succeedingEventTypes) {
 			Event succeedingEvent = getEventByType(events, eventType);
 			if (isEarlier(succeedingEvent, targetEvent)) {
-				return false;
+				return 0.0;
 			}
 		}
-		return true;
+		return 1.0;
 	}
 	
 	public Event getActualPrecedingEvent(List<Event> events) {

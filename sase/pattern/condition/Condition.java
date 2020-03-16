@@ -1,11 +1,11 @@
 package sase.pattern.condition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.statistics.ConditionSelectivityCollector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a condition to be satisfied by a complex event.
@@ -53,7 +53,10 @@ public abstract class Condition {
 		return String.format("Condition on types %s", eventTypes);
 	}
 	
-	public abstract boolean verify(List<Event> events);
+	//public abstract boolean verify(List<Event> events);
+
+	public abstract Double verify(List<Event> events);
+
 	protected abstract String getConditionKey();
 }
 

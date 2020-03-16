@@ -1,7 +1,5 @@
 package sase.pattern.condition.iteration.lazy;
 
-import java.util.List;
-
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
@@ -9,6 +7,8 @@ import sase.pattern.condition.iteration.IteratedEventInternalCondition;
 import sase.pattern.condition.iteration.eager.IteratedIncrementalCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.List;
 
 public class IteratedTotalFromIncrementalCondition extends IteratedEventInternalCondition {
 
@@ -25,24 +25,26 @@ public class IteratedTotalFromIncrementalCondition extends IteratedEventInternal
 	}
 
 	@Override
-	protected boolean verifyAggregatedEvent(AggregatedEvent event) {
+	protected Double verifyAggregatedEvent(AggregatedEvent event) {
 		//we decrease this statistic by one since this condition invokes an internal condition, which increases
 		//this counter again
 		Environment.getEnvironment().getStatisticsManager().decrementDiscreteStatistic(Statistics.computations);
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return true;
+			return 1.0;
 		}
 		Event prevEvent = null;
+		Double incrementalProb = 1.0;
 		for (Event primitiveEvent : primitiveEvents) {
 			if (prevEvent != null) {
-				if (!(incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent))) {
-					return false;
-				}
+				Double currentiIncrementalProb = incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent);
+				if(currentiIncrementalProb > 0.0){
+					incrementalProb *= currentiIncrementalProb;
+				} else return 0.0;
 			}
 			prevEvent = primitiveEvent;
 		}
-		return true;
+		return incrementalProb;
 	}
 
 	@Override

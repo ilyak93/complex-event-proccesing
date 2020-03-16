@@ -1,10 +1,10 @@
 package sase.pattern.condition.iteration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.pattern.condition.base.DoubleEventCondition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FirstValueExternalCondition extends IteratedEventExternalCondition {
 
@@ -16,9 +16,9 @@ public class FirstValueExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
 		if (internalEvents.isEmpty()) {
-			return false;
+			return 0.0;
 		}
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(internalEvents.get(0));

@@ -1,11 +1,11 @@
 package sase.pattern;
 
+import sase.base.Event;
+import sase.base.EventType;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import sase.base.Event;
-import sase.base.EventType;
 
 /**
  * This class contains information regarding all types of primitive events used by the framework.

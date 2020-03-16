@@ -1,10 +1,10 @@
 package sase.pattern.condition.iteration.lazy;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.iteration.IteratedEventExternalCondition;
+
+import java.util.List;
 
 public abstract class IteratedFilterCondition extends IteratedEventExternalCondition {
 
@@ -13,15 +13,17 @@ public abstract class IteratedFilterCondition extends IteratedEventExternalCondi
 	}
 
 	@Override
-	protected boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+		Double filterProb = 1.0;
 		for (Event event : internalEvents) {
-			if (!filterEvent(event, externalEvent)) {
-				return false;
-			}
+			Double currentFilterProb = filterEvent(event, externalEvent);
+			if(currentFilterProb > 0.0){
+				filterProb*=currentFilterProb;
+			} else return 0.0;
 		}
-		return true;
+		return filterProb;
 	}
 	
-	public abstract boolean filterEvent(Event iteratedEvent, Event nonIteratedEvent);
+	public abstract Double filterEvent(Event iteratedEvent, Event nonIteratedEvent);
 
 }

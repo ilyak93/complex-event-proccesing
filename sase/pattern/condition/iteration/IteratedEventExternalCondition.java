@@ -1,11 +1,11 @@
 package sase.pattern.condition.iteration;
 
-import java.util.List;
-
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.base.DoubleEventCondition;
+
+import java.util.List;
 
 public abstract class IteratedEventExternalCondition extends DoubleEventCondition {
 	
@@ -14,7 +14,7 @@ public abstract class IteratedEventExternalCondition extends DoubleEventConditio
 	}
 
 	@Override
-	protected boolean verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
 		if (firstEvent instanceof AggregatedEvent) {
 			return verifyListOfEventsWithExternalEvent(((AggregatedEvent)firstEvent).getPrimitiveEvents(), 
 													   secondEvent);
@@ -28,5 +28,5 @@ public abstract class IteratedEventExternalCondition extends DoubleEventConditio
 						firstEvent, secondEvent));
 	}
 
-	protected abstract boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent);
+	protected abstract Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent);
 }

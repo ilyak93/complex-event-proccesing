@@ -1,10 +1,10 @@
 package sase.pattern.condition.contiguity;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.base.AtomicCondition;
+
+import java.util.List;
 
 public class PartialContiguityCondition extends AtomicCondition {
 
@@ -18,7 +18,7 @@ public class PartialContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events) {
 		if (events.size() != 2) {
 			throw new RuntimeException(String.format("Unexpected number of events: %d", events.size()));
 		}
@@ -29,7 +29,8 @@ public class PartialContiguityCondition extends AtomicCondition {
 		if (firstIndex == -1 || secondIndex == -1) {
 			throw new RuntimeException(String.format("Events not found: %s %s", firstEvent, secondEvent));
 		}
-		return (firstIndex - secondIndex == firstEvent.getSequenceNumber() - secondEvent.getSequenceNumber());
+		Double result = (double) (firstIndex - secondIndex - (firstEvent.getSequenceNumber() - secondEvent.getSequenceNumber()));
+		return result == 0.0 ? 1.0 : 0.0;
 	}
 
 	@Override

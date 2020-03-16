@@ -14,15 +14,15 @@ public abstract class IteratedIncrementalCondition extends IteratedEventInternal
 	}
 
 	@Override
-	protected boolean verifyAggregatedEvent(AggregatedEvent event) {
+	protected Double verifyAggregatedEvent(AggregatedEvent event) {
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return true;
+			return 1.0;
 		}
 		Event lastEvent = primitiveEvents.get(primitiveEvents.size() - 1);
 		Event eventBeforeLast = primitiveEvents.get(primitiveEvents.size() - 2);
 		return verifyAdjacentEvents(lastEvent, eventBeforeLast);
 	}
 
-	public abstract boolean verifyAdjacentEvents(Event firstEvent, Event secondEvent);
+	public abstract Double verifyAdjacentEvents(Event firstEvent, Event secondEvent);
 }

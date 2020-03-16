@@ -1,13 +1,13 @@
 package sase.pattern.condition.iteration;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.aggregator.VectorAggregator;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
 import sase.pattern.condition.Condition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AggregatedExternalCondition extends IteratedEventExternalCondition {
 
@@ -22,7 +22,7 @@ public class AggregatedExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
 		if (internalEvents.size() == 0) {
 			throw new RuntimeException("Empty list of events encountered");
 		}

@@ -1,10 +1,10 @@
 package sase.pattern.condition.contiguity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.Event;
 import sase.pattern.condition.base.AtomicCondition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TotalContiguityCondition extends AtomicCondition {
 
@@ -15,9 +15,9 @@ public class TotalContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected boolean actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events) {
 		if (events.size() < 2) {
-			return true;
+			return 1.0;
 		}
 		List<Event> orderedEvents = new ArrayList<Event>(events);
 		orderedEvents.sort(null);
@@ -25,10 +25,10 @@ public class TotalContiguityCondition extends AtomicCondition {
 			long firstSequenceNumber = orderedEvents.get(i).getSequenceNumber();
 			long secondSequenceNumber = orderedEvents.get(i+1).getSequenceNumber();
 			if (firstSequenceNumber != secondSequenceNumber - 1) {
-				return false;
+				return 0.0;
 			}
 		}
-		return true;
+		return 1.0;
 	}
 
 	@Override

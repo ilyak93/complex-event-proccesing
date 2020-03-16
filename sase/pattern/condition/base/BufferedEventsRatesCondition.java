@@ -1,11 +1,11 @@
 package sase.pattern.condition.base;
 
-import java.util.HashMap;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
 import sase.evaluation.nfa.NFA;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Represents a special condition, operating on a built-in primitive event reporting the status of
@@ -24,26 +24,26 @@ public class BufferedEventsRatesCondition extends SingleEventCondition {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean verifySingleEvent(Event event) {
+	protected Double verifySingleEvent(Event event) {
 		if (event.getType() != NFA.inputEventType)
-			return false;
+			return 0.0;
 		Object countersObject = event.getAttributeValue(NFA.inputBufferCountersAttributeName);
 		if (!(countersObject instanceof HashMap<?, ?>))
-			return false;
+			return 0.0;
 		if (order == null)
-			return true;
+			return 0.0;
 		HashMap<EventType, Integer> counters = (HashMap<EventType, Integer>)countersObject;
 		for (int i = 0; i < order.size(); ++i) {
 			Integer counter = counters.get(order.get(i));
 			if (counter == 0)
-				return false;
+				return 0.0;
 			if (i == 0)
 				continue;
 			Integer prevCounter = counters.get(order.get(i - 1));
 			if (prevCounter > counter)
-				return false;
+				return 0.0;
 		}
-		return true;
+		return 1.0;
 	}
 	
 	@Override
