@@ -8,10 +8,12 @@ import java.util.Objects;
 public class Match {
 	private final List<Event> primitiveEvents;
 	private final long detectionLatency;
+	private Double conditions_prob;
 	
 	public Match(List<Event> primitiveEvents, long latestEventTimestamp) {
 		this.primitiveEvents = primitiveEvents;
 		this.detectionLatency = System.currentTimeMillis() - latestEventTimestamp;
+		this.conditions_prob = 1.0;
 	}
 	
 	public List<Event> getPrimitiveEvents() {
@@ -55,7 +57,7 @@ public class Match {
 		for(Event e : this.primitiveEvents){
 			prob *= e.getProb();
 		}
-		return prob;
+		return prob*this.conditions_prob;
 	}
 
 	@Override
@@ -70,4 +72,8 @@ public class Match {
 		result += "]";
 		return result;
 	}
+
+    public void updateMatchConditionsProb(Double prob) {
+		this.conditions_prob *= prob;
+    }
 }
