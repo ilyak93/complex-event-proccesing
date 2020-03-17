@@ -14,7 +14,7 @@ public class DiscreteDistributionPayload extends Payload {
         String[] valuesProbablities = (raw).split(" ");
         assert valuesProbablities.length != 0;
         valuesProbabilities = new LinkedList<Pair<Double,Double>>();
-        for(int i = 1; i < valuesProbablities.length-1; i+=2){ // first [ and last ]
+        for(int i = 1; i < valuesProbablities.length-1; i++){ // first [ and last ]
             String[] valueProb = valuesProbablities[i].split(":");
             valuesProbabilities.add(new Pair(
                     Double.parseDouble(valueProb[0]),
