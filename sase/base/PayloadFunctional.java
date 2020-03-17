@@ -2,8 +2,10 @@ package sase.base;
 
 import javafx.util.Pair;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class PayloadFunctional {
 
@@ -194,6 +196,7 @@ public abstract class PayloadFunctional {
     updateLists(DiscreteDistributionPayload a, DiscreteDistributionPayload b) {
         List<Pair<Double, Double>> valuesProbabilities1 = a.getValue();
         List<Pair<Double, Double>> valuesProbabilities2 = b.getValue();
+        Set<Double> valuesToRemove = new HashSet<Double>();
         for (Pair<Double, Double> p1 : valuesProbabilities1) {
             Boolean keppCurValue = false;
             for (Pair<Double, Double> p2 : valuesProbabilities2) {
@@ -202,9 +205,13 @@ public abstract class PayloadFunctional {
                 }
             }
             if (keppCurValue == false) {
-                valuesProbabilities1.removeIf(pair -> pair.getKey() == p1.getKey());
+                valuesToRemove.add(p1.getKey());
             }
         }
+        for(Double valueToRemove : valuesToRemove){
+            valuesProbabilities1.removeIf(pair -> pair.getKey() == valueToRemove);
+        }
+        valuesToRemove.clear();
         for (Pair<Double, Double> p2 : valuesProbabilities2) {
             Boolean keppCurValue = false;
             for (Pair<Double, Double> p1 : valuesProbabilities1) {
@@ -213,8 +220,11 @@ public abstract class PayloadFunctional {
                 }
             }
             if (keppCurValue == false) {
-                valuesProbabilities2.removeIf(pair -> pair.getKey() == p2.getKey());
+                valuesToRemove.add(p2.getKey());
             }
+        }
+        for(Double valueToRemove : valuesToRemove){
+            valuesProbabilities2.removeIf(pair -> pair.getKey() == valueToRemove);
         }
         return new Pair(valuesProbabilities1, valuesProbabilities2);
     }
