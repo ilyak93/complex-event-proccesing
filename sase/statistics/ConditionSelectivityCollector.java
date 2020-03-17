@@ -1,13 +1,9 @@
 package sase.statistics;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.HashMap;
-
 import sase.config.MainConfig;
+
+import java.io.*;
+import java.util.HashMap;
 
 public class ConditionSelectivityCollector {
 	
@@ -42,13 +38,13 @@ public class ConditionSelectivityCollector {
 		}
 	}
 	
-	public void recordConditionEvaluation(String key, boolean success) {
+	public void recordConditionEvaluation(String key, Double success_prob) {
 		SelectivityCounters countersForKey = counters.get(key);
 		if (countersForKey == null) {
 			countersForKey = new SelectivityCounters();
 		}
 		++countersForKey.in;
-		if (success) {
+		if (success_prob > 0) {
 			++countersForKey.out;
 		}
 		counters.put(key, countersForKey);
