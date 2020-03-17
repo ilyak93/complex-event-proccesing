@@ -1,12 +1,5 @@
 package sase.evaluation.tree;
 
-import java.util.List;
-import java.util.Queue;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 import sase.base.Event;
 import sase.base.EventSelectionStrategies;
 import sase.base.EventType;
@@ -20,11 +13,7 @@ import sase.evaluation.plan.EvaluationPlan;
 import sase.evaluation.plan.TreeEvaluationPlan;
 import sase.evaluation.tree.elements.TreeInstance;
 import sase.evaluation.tree.elements.TreeInstanceStorage;
-import sase.evaluation.tree.elements.node.InternalNode;
-import sase.evaluation.tree.elements.node.LeafNode;
-import sase.evaluation.tree.elements.node.NSeqInternalNode;
-import sase.evaluation.tree.elements.node.Node;
-import sase.evaluation.tree.elements.node.SeqInternalNode;
+import sase.evaluation.tree.elements.node.*;
 import sase.pattern.CompositePattern;
 import sase.pattern.Pattern;
 import sase.pattern.Pattern.PatternOperatorTypes;
@@ -32,6 +21,8 @@ import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.*;
 
 public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluationMechanismInfo {
 	
@@ -96,7 +87,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 		}
 		TreeInstance leafInstance = createLeafInstance(leafForEvent);
 		leafInstance.addEvent(event);
-		if (!leafInstance.validateNodeCondition()) {
+		if (leafInstance.validateNodeCondition() <= 0.0) {
 			return storage.getMatches();
 		}
 		if (isIterativeInstance(leafInstance)) {
@@ -159,7 +150,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 					continue;
 				}
 				TreeInstance parentInstance = currentInstance.createParentInstance(peerInstance);
-				if (parentInstance.validateNodeCondition()) {
+				if (parentInstance.validateNodeCondition() > 0.0) {
 					instanceQueue.add(parentInstance);
 				}
 			}
@@ -186,7 +177,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 			newIterativeInstances.add(leafInstance);
 			for (TreeInstance treeInstance : iterativeInstances) {
 				TreeInstance newInstance = treeInstance.createExtendedAggregatedLeafInstance(currentEvent);
-				if (newInstance.validateNodeCondition()) {
+				if (newInstance.validateNodeCondition() >= 0.0) {
 					newIterativeInstances.add(newInstance);
 				}
 			}
