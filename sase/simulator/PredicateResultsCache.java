@@ -1,26 +1,26 @@
 package sase.simulator;
 
-import java.util.HashMap;
-
 import sase.base.Event;
 import sase.pattern.condition.base.AtomicCondition;
+
+import java.util.HashMap;
 
 //TODO: for now, only two-operand predicates will be supported!
 public class PredicateResultsCache {
 
 	private class DoubleEventPredicateCache {
 	
-		private HashMap<Event, HashMap<Event, Boolean>> cache;
+		private HashMap<Event, HashMap<Event, Double>> cache;
 		
 		public DoubleEventPredicateCache() {
-			cache = new HashMap<Event, HashMap<Event,Boolean>>();
+			cache = new HashMap<Event, HashMap<Event,Double>>();
 		}
 		
-		public void recordConditionEvaluation(Event firstEvent, Event secondEvent, boolean result) {
-			HashMap<Event, Boolean> internalCache = cache.get(firstEvent);
+		public void recordConditionEvaluation(Event firstEvent, Event secondEvent, Double result) {
+			HashMap<Event, Double> internalCache = cache.get(firstEvent);
 			boolean internalCacheExists = (internalCache != null);
 			if (!internalCacheExists) {
-				internalCache = new HashMap<Event, Boolean>();
+				internalCache = new HashMap<Event, Double>();
 			}
 			internalCache.put(secondEvent, result);
 			if (!internalCacheExists) {
@@ -28,8 +28,8 @@ public class PredicateResultsCache {
 			}
 		}
 		
-		public Boolean getConditionEvaluationResult(Event firstEvent, Event secondEvent) {
-			HashMap<Event, Boolean> internalCache = cache.get(firstEvent);
+		public Double getConditionEvaluationResult(Event firstEvent, Event secondEvent) {
+			HashMap<Event, Double> internalCache = cache.get(firstEvent);
 			if (internalCache == null) {
 				return null;
 			}
@@ -44,7 +44,9 @@ public class PredicateResultsCache {
 		cache = new HashMap<AtomicCondition, DoubleEventPredicateCache>();
 	}
 	
-	public void recordConditionEvaluation(AtomicCondition condition, Event firstEvent, Event secondEvent, boolean result) {
+	public void recordConditionEvaluation(AtomicCondition condition,
+										  Event firstEvent, Event secondEvent,
+										  Double result) {
 		DoubleEventPredicateCache predicateCache = cache.get(condition);
 		boolean predicateCacheExists = (predicateCache != null);
 		if (!predicateCacheExists) {
@@ -56,7 +58,7 @@ public class PredicateResultsCache {
 		}
 	}
 	
-	public Boolean getConditionEvaluationResult(AtomicCondition condition, Event firstEvent, Event secondEvent) {
+	public Double getConditionEvaluationResult(AtomicCondition condition, Event firstEvent, Event secondEvent) {
 		DoubleEventPredicateCache predicateCache = cache.get(condition);
 		if (predicateCache == null) {
 			return null;

@@ -1,5 +1,6 @@
 package sase.simulator;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import sase.adaptive.monitoring.IAdaptationNecessityDetector;
 import sase.adaptive.monitoring.IMultiPatternAdaptationNecessityDetector;
 import sase.base.Event;
@@ -37,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import au.com.bytecode.opencsv.CSVWriter;
 
 public class Simulator {
 
