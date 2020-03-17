@@ -1,15 +1,15 @@
 package sase.evaluation.tree.elements.node;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import sase.base.EventType;
 import sase.evaluation.common.State;
 import sase.evaluation.tree.elements.TreeInstance;
 import sase.pattern.condition.base.AtomicCondition;
 import sase.pattern.condition.base.CNFCondition;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public abstract class Node extends State {
 
@@ -102,9 +102,9 @@ public abstract class Node extends State {
 		return nodeCondition;
 	}
 	
-	public boolean isNodeConditionSatisfied(TreeInstance treeInstance) {
+	public Double isNodeConditionSatisfied(TreeInstance treeInstance) {
 		if (nodeCondition == null) {
-			return false;
+			return 0.0;
 		}
 		return nodeCondition.verify(treeInstance.getEvents());
 	}
