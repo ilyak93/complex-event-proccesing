@@ -1,10 +1,11 @@
 package sase.adaptive.estimation;
 
-import java.util.HashMap;
 import sase.evaluation.IEvaluationMechanismInfo;
 import sase.evaluation.common.State;
 import sase.pattern.condition.base.AtomicCondition;
 import sase.simulator.Environment;
+
+import java.util.HashMap;
 
 public class SlidingWindowSelectivityEstimator {
 
@@ -20,10 +21,11 @@ public class SlidingWindowSelectivityEstimator {
 		this.maxError = maxError;
 	}
 	
-	public void registerConditionVerification(AtomicCondition condition, boolean result) {
+	public void registerConditionVerification(AtomicCondition condition, Double result_prob) {
 		if (!estimators.containsKey(condition)) {
 			estimators.put(condition, new ExponentialHistogramsCounter(calculateWindowSizeForCondition(condition), maxError));
 		}
+		boolean result = result_prob > 0;
 		estimators.get(condition).addElement(result);
 	}
 	
