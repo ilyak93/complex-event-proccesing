@@ -1,7 +1,5 @@
 package sase.evaluation.tree.elements;
 
-import java.util.List;
-
 import sase.base.Event;
 import sase.evaluation.common.EventBuffer;
 import sase.evaluation.common.Match;
@@ -10,6 +8,8 @@ import sase.evaluation.tree.elements.node.LeafNode;
 import sase.evaluation.tree.elements.node.Node;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
+
+import java.util.List;
 
 public class TreeInstance {
 
@@ -93,7 +93,7 @@ public class TreeInstance {
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteMemoryStatistic(Statistics.bufferInsertions);
 	}
 	
-	public boolean validateNodeCondition() {
+	public Double validateNodeCondition() {
 		return currentNode.isNodeConditionSatisfied(this);
 	}
 	
