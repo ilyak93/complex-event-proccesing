@@ -1,0 +1,23 @@
+Pattern:  ['MSFT', 'CSCO', 'QTWW']
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Found  MSFT
+Found  CSCO
+Found  MSFT
+Found  MSFT
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Number of matches: 0
+**********************************************************************************************************
+Table of events showing the difference inside attributes after dynamic updates:
+Empty DataFrame
+Columns: [Stock, TimeStamp, Attributes for delta, Stock Prob, Status]
+Index: []
+**********************************************************************************************************
+Table of pattern matchs and their probabilities:
+Empty DataFrame
+Columns: [Stock1, TimeStamp1, Stock2, TimeStamp2, Stock3, TimeStamp3, Pattern Prob]
+Index: []
+**********************************************************************************************************
+Table of events showing the difference inside attributes after dynamic updates together:
+Empty DataFrame
+Columns: [Stock, TimeStamp, Attributes for delta, Stock Prob, Status]
+Index: []
