@@ -2,6 +2,7 @@ package sase.user.trams;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 import java.util.Arrays;
@@ -25,7 +26,8 @@ public class TramCongestionIntersectionCondition extends DoubleEventCondition {
 	}
 	
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		HashSet<String> firstEventLineNumbers = getEventLineNumbers(firstEvent);
 		HashSet<String> secondEventLineNumbers = getEventLineNumbers(secondEvent);
 		firstEventLineNumbers.retainAll(secondEventLineNumbers);

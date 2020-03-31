@@ -2,6 +2,7 @@ package sase.user.stocks.condition;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
@@ -39,7 +40,8 @@ public class StockCorrelationCondition extends DoubleEventCondition {
 	}
 	
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		if (getCompanyName(firstEvent) == getCompanyName(secondEvent))
 			return 0.0;
 		

@@ -2,6 +2,7 @@ package sase.user.speedd.traffic;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 public class TrafficSimilarVehicleIDCondition extends DoubleEventCondition {
@@ -17,7 +18,7 @@ public class TrafficSimilarVehicleIDCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		Long firstID = (Long) firstEvent.getAttributeValue(TrafficEventTypesManager.vehicleIDAttributeIndex);
 		Long secondID = (Long) secondEvent.getAttributeValue(TrafficEventTypesManager.vehicleIDAttributeIndex);
 		//return Math.abs(firstID - secondID) <= maxDiff;

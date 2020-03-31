@@ -2,6 +2,7 @@ package sase.user.stocks.condition;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 import sase.user.stocks.StockEventTypesManager;
 
@@ -49,7 +50,8 @@ public class StockFirstValueCmpCondition extends DoubleEventCondition {
 	}
 	
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		int firstEventValue = ((Double)getStockFirstValue(firstEvent)).intValue();
 		int secondEventValue = ((Double)getStockFirstValue(secondEvent)).intValue();
 		switch (operation) {

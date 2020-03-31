@@ -2,6 +2,7 @@ package sase.user.stocks.condition;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.SingleEventCondition;
 
 /**
@@ -24,7 +25,7 @@ public class StockRangeCondition extends SingleEventCondition {
 	}
 	
 	@Override
-	protected Double verifySingleEvent(Event event) {
+	protected Double verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
 		//return (getStockPricesRange(event) >= minRange);
 		//TODO: use our function and type
 		return 1.0;

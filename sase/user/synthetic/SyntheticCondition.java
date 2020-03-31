@@ -2,6 +2,7 @@ package sase.user.synthetic;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.input.producers.ISyntheticSelectivityProvider;
 import sase.pattern.condition.base.DoubleEventCondition;
 
@@ -22,7 +23,8 @@ public class SyntheticCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		if (selectivityProvider == null) {
 			throw new RuntimeException("The selectivity provider was not set yet.");
 		}

@@ -19,20 +19,28 @@ public class StockDeltaOrderingCondition extends DoubleEventCondition {
 		super(firstType, secondType);
 	}
 	
-	private Payload calculateDelta(Event event) { //TODO: use our type
+	private Payload calculateDelta(Event event, Payload.PayLoadUpdateGraph graph) { //TODO: use our type
 		Payload firstValue = (Payload)event.getAttributeValue(
 				StockEventTypesManager.firstStockMeasurementIndex);
 		Payload secondValue = (Payload)event.getAttributeValue(
 				StockEventTypesManager.firstStockMeasurementIndex + 1);
 		return PayloadFunctional.abs(PayloadFunctional.substract(
-				firstValue,secondValue));
+				firstValue,secondValue, graph), graph);
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
-		Payload a = calculateDelta(firstEvent);
-		Payload b = calculateDelta(secondEvent);
-		return PayloadFunctional.lessThen(a, b); //TODO: use our function and type
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
+		//this.graph.clear();
+		Payload.PayLoadUpdateGraph newGraph = new Payload.PayLoadUpdateGraph();
+		newGraph.setLeftestEventType(firstEvent.getType().getName());
+		newGraph.setRightestEventType(secondEvent.getType().getName());
+		Payload a = calculateDelta(firstEvent, newGraph);
+		newGraph.setLeftestOperand(a.getLeftestOperand());
+		Payload b = calculateDelta(secondEvent, newGraph);
+		newGraph.setRightestOperand(b.getLeftestOperand());
+		Double result = PayloadFunctional.lessThen(a, b, newGraph); //TODO: use our function and type
+		graph.addGraph(newGraph);
+		return result;
 	}
 	
 	@Override

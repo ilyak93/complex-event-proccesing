@@ -2,6 +2,7 @@ package sase.user.traffic;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 public class TrafficSpeedToVehiclesNumberCorrelationCondition extends DoubleEventCondition {
@@ -13,7 +14,8 @@ public class TrafficSpeedToVehiclesNumberCorrelationCondition extends DoubleEven
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		Integer firstPointID = (Integer) firstEvent.getAttributeValue(AarhusTrafficEventTypesManager.pointIDAttributeName);
 		Integer secondPointID = (Integer) secondEvent.getAttributeValue(AarhusTrafficEventTypesManager.pointIDAttributeName);
 		if (firstPointID == secondPointID) {
