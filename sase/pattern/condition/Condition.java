@@ -2,6 +2,7 @@ package sase.pattern.condition;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.statistics.ConditionSelectivityCollector;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public abstract class Condition {
 	
 	//public abstract boolean verify(List<Event> events);
 
-	public abstract Double verify(List<Event> events);
+	public abstract Double verify(List<Event> events, Payload.ConditionsGraph graph);
 
 	protected abstract String getConditionKey();
 }

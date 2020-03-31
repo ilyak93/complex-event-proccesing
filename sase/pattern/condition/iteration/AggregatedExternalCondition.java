@@ -4,6 +4,7 @@ import sase.aggregator.VectorAggregator;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.Condition;
 
 import java.util.ArrayList;
@@ -22,7 +23,8 @@ public class AggregatedExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+														 Payload.ConditionsGraph graph) {
 		if (internalEvents.size() == 0) {
 			throw new RuntimeException("Empty list of events encountered");
 		}
@@ -33,12 +35,11 @@ public class AggregatedExternalCondition extends IteratedEventExternalCondition 
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(aggregatedEvent);
 		eventsToVerify.add(externalEvent);
-		return condition.verify(eventsToVerify);
+		return condition.verify(eventsToVerify, graph);
 	}
 
 	@Override
 	protected String getConditionKey() {
 		return "Unsupported";
 	}
-
 }

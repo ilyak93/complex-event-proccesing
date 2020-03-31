@@ -2,6 +2,7 @@ package sase.pattern.condition.base;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.evaluation.nfa.NFA;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class BufferedEventsRatesCondition extends SingleEventCondition {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Double verifySingleEvent(Event event) {
+	protected Double verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
 		if (event.getType() != NFA.inputEventType)
 			return 0.0;
 		Object countersObject = event.getAttributeValue(NFA.inputBufferCountersAttributeName);

@@ -2,6 +2,7 @@ package sase.pattern.condition.contiguity;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 public class PairwiseContiguityCondition extends DoubleEventCondition {
@@ -21,7 +22,8 @@ public class PairwiseContiguityCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		Double result = (double)(firstEvent.getSequenceNumber() - (secondEvent.getSequenceNumber() - difference));
 		return result == 0.0 ? 1.0 : 0.0;
 	}

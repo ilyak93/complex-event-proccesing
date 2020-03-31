@@ -1,6 +1,7 @@
 package sase.pattern.condition.contiguity;
 
 import sase.base.Event;
+import sase.base.Payload;
 import sase.pattern.condition.base.AtomicCondition;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class TotalContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected Double actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (events.size() < 2) {
 			return 1.0;
 		}

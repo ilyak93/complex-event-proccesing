@@ -3,6 +3,7 @@ package sase.pattern.condition.iteration;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 import java.util.List;
@@ -14,19 +15,21 @@ public abstract class IteratedEventExternalCondition extends DoubleEventConditio
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent) {
+	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+                                       Payload.ConditionsGraph graph) {
 		if (firstEvent instanceof AggregatedEvent) {
 			return verifyListOfEventsWithExternalEvent(((AggregatedEvent)firstEvent).getPrimitiveEvents(), 
-													   secondEvent);
+													   secondEvent, graph);
 		}
 		if (secondEvent instanceof AggregatedEvent) {
 			return verifyListOfEventsWithExternalEvent(((AggregatedEvent)secondEvent).getPrimitiveEvents(), 
-													   firstEvent);
+													   firstEvent, graph);
 		}
 		throw new RuntimeException(
 						String.format("Aggregated event expected, primitive events %s and %s received instead", 
 						firstEvent, secondEvent));
 	}
 
-	protected abstract Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent);
+	protected abstract Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+																  Payload.ConditionsGraph graph);
 }

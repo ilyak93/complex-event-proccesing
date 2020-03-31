@@ -2,6 +2,7 @@ package sase.pattern.condition.base;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.simulator.Environment;
 import sase.statistics.Statistics;
@@ -34,7 +35,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected Double actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		Event firstEvent = null;
 		Event secondEvent = null;
 		for (Event event : events) {
@@ -44,7 +45,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 				secondEvent = event;
 			if (firstEvent != null && secondEvent != null) {
 				Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.computations);
-				return verifyDoubleEvent(firstEvent, secondEvent);
+				return verifyDoubleEvent(firstEvent, secondEvent, graph);
 			}
 		}
 		return 0.0;
@@ -63,5 +64,6 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 		return String.format("%s:%s", firstType.getName(), secondType.getName());
 	}
 	
-	protected abstract Double verifyDoubleEvent(Event firstEvent, Event secondEvent);
+	protected abstract Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+												Payload.ConditionsGraph graph);
 }

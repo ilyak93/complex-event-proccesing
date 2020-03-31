@@ -2,6 +2,7 @@ package sase.pattern.condition.contiguity;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.AtomicCondition;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class PartialContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected Double actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (events.size() != 2) {
 			throw new RuntimeException(String.format("Unexpected number of events: %d", events.size()));
 		}

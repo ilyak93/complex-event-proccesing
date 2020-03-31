@@ -1,6 +1,7 @@
 package sase.pattern.condition.iteration.eager;
 
 import sase.base.Event;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 import sase.pattern.condition.iteration.IteratedEventExternalCondition;
 import sase.simulator.Environment;
@@ -21,7 +22,8 @@ public class IterationTriggerCondition extends IteratedEventExternalCondition {
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+														 Payload.ConditionsGraph graph) {
 		//we decrease this statistic by one since this condition invokes an internal condition, which increases
 		//this counter again
 		Environment.getEnvironment().getStatisticsManager().decrementDiscreteStatistic(Statistics.computations);
@@ -37,7 +39,7 @@ public class IterationTriggerCondition extends IteratedEventExternalCondition {
 		//non-iterated event first (intuitively, it goes 'before' the iterated one)
 		eventsToVerifyWithTriggerCondition.add(externalEvent);
 		eventsToVerifyWithTriggerCondition.add(leadingEvent);
-		Double result = triggerCondition.verify(eventsToVerifyWithTriggerCondition);
+		Double result = triggerCondition.verify(eventsToVerifyWithTriggerCondition, graph);
 		if (isCacheEnabled()) {
 			triggerConditionVerificationCache.put(leadingEvent, result);
 		}

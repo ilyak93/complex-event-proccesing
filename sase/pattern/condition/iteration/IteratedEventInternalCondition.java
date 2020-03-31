@@ -3,6 +3,7 @@ package sase.pattern.condition.iteration;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.SingleEventCondition;
 
 public abstract class IteratedEventInternalCondition extends SingleEventCondition {
@@ -16,15 +17,15 @@ public abstract class IteratedEventInternalCondition extends SingleEventConditio
 	}
 
 	@Override
-	protected Double verifySingleEvent(Event event) {
+	protected Double verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
 		if (!(event instanceof AggregatedEvent)) {
 			throw new RuntimeException(
 				String.format("Aggregated event of type %s expected, primitive event %s received instead", type, event));
 		}
 		AggregatedEvent aggregatedEvent = (AggregatedEvent)event;
-		return verifyAggregatedEvent(aggregatedEvent);
+		return verifyAggregatedEvent(aggregatedEvent, graph);
 	}
 	
-	protected abstract Double verifyAggregatedEvent(AggregatedEvent event);
+	protected abstract Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph);
 
 }

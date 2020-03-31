@@ -3,6 +3,7 @@ package sase.pattern.condition.iteration.lazy;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.iteration.IteratedEventInternalCondition;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class GroupByAttributeCondition extends IteratedEventInternalCondition {
 	}
 
 	@Override
-	protected Double verifyAggregatedEvent(AggregatedEvent event) {
+	protected Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
 			return 1.0;

@@ -3,6 +3,7 @@ package sase.pattern.condition.iteration.lazy;
 import sase.base.AggregatedEvent;
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.iteration.IteratedEventInternalCondition;
 import sase.pattern.condition.iteration.eager.IteratedIncrementalCondition;
 import sase.simulator.Environment;
@@ -25,7 +26,7 @@ public class IteratedTotalFromIncrementalCondition extends IteratedEventInternal
 	}
 
 	@Override
-	protected Double verifyAggregatedEvent(AggregatedEvent event) {
+	protected Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
 		//we decrease this statistic by one since this condition invokes an internal condition, which increases
 		//this counter again
 		Environment.getEnvironment().getStatisticsManager().decrementDiscreteStatistic(Statistics.computations);
@@ -37,7 +38,7 @@ public class IteratedTotalFromIncrementalCondition extends IteratedEventInternal
 		Double incrementalProb = 1.0;
 		for (Event primitiveEvent : primitiveEvents) {
 			if (prevEvent != null) {
-				Double currentiIncrementalProb = incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent);
+				Double currentiIncrementalProb = incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent, graph);
 				if(currentiIncrementalProb > 0.0){
 					incrementalProb *= currentiIncrementalProb;
 				} else return 0.0;

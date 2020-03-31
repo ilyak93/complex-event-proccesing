@@ -1,6 +1,7 @@
 package sase.pattern.condition.iteration.eager;
 
 import sase.base.Event;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 import java.util.ArrayList;
@@ -16,11 +17,11 @@ public class IteratedIncrementalDoubleEventCondition extends IteratedIncremental
 	}
 
 	@Override
-	public Double verifyAdjacentEvents(Event firstEvent, Event secondEvent) {
+	public Double verifyAdjacentEvents(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(firstEvent);
 		eventsToVerify.add(secondEvent);
-		return nestedCondition.verify(eventsToVerify);
+		return nestedCondition.verify(eventsToVerify, graph);
 	}
 
 	@Override

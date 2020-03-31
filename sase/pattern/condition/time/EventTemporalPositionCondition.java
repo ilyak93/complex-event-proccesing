@@ -2,6 +2,7 @@ package sase.pattern.condition.time;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.base.AtomicCondition;
 
 import java.util.HashSet;
@@ -48,7 +49,7 @@ public class EventTemporalPositionCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected Double actuallyVerify(List<Event> events) {
+	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		Event targetEvent = getEventByType(events, targetEventType);
 		if (targetEvent == null)
 			throw new RuntimeException("Cannot verify condition - the target event was not found.");

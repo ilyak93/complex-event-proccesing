@@ -2,6 +2,7 @@ package sase.pattern.condition.base;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.pattern.condition.Condition;
 
 import java.util.ArrayList;
@@ -69,10 +70,10 @@ public class CNFCondition extends Condition {
 	}
 	*/
 	@Override
-	public Double verify(List<Event> events) {
+	public Double verify(List<Event> events, Payload.ConditionsGraph graph) {
 		Double condProb = 1.0;
 		for (AtomicCondition condition : atomicConditions) {
-			Double current_condition_prob = condition.verify(events);;
+			Double current_condition_prob = condition.verify(events, graph);;
 			if(current_condition_prob <= 0.0) return current_condition_prob;
 			condProb *= current_condition_prob;
 		}

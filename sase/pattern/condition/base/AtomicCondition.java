@@ -2,6 +2,7 @@ package sase.pattern.condition.base;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.pattern.condition.Condition;
 import sase.simulator.Environment;
@@ -30,9 +31,9 @@ public abstract class AtomicCondition extends Condition {
 		return super.getSelectivity();
 	}
 	
-	public Double verify(List<Event> events) {
+	public Double verify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (shouldIgnoreSelectivityMeasurements()) {
-			return actuallyVerify(events);
+			return actuallyVerify(events, graph);
 		}
 		Event firstEvent = null;
 		Event secondEvent = null;
@@ -49,7 +50,7 @@ public abstract class AtomicCondition extends Condition {
 				return success_prob;
 			}
 		}
-		Double success_prob = actuallyVerify(events);
+		Double success_prob = actuallyVerify(events, graph);
 		if (MainConfig.conditionSelectivityMeasurementMode) {
 			ConditionSelectivityCollector.getInstance().recordConditionEvaluation(getConditionKey(), success_prob);
 		}
@@ -77,6 +78,6 @@ public abstract class AtomicCondition extends Condition {
 		return false;
 	}
 	
-	protected abstract Double actuallyVerify(List<Event> events);
+	protected abstract Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph);
 	
 }

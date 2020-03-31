@@ -1,6 +1,7 @@
 package sase.pattern.condition.iteration;
 
 import sase.base.Event;
+import sase.base.Payload;
 import sase.pattern.condition.base.DoubleEventCondition;
 
 import java.util.ArrayList;
@@ -16,14 +17,15 @@ public class FirstValueExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent) {
+	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+														 Payload.ConditionsGraph graph) {
 		if (internalEvents.isEmpty()) {
 			return 0.0;
 		}
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(internalEvents.get(0));
 		eventsToVerify.add(externalEvent);
-		return nestedCondition.verify(eventsToVerify);
+		return nestedCondition.verify(eventsToVerify, graph);
 	}
 
 }
