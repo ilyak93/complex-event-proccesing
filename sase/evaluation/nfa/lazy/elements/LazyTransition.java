@@ -2,6 +2,7 @@ package sase.evaluation.nfa.lazy.elements;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.evaluation.nfa.eager.elements.NFAState;
 import sase.evaluation.nfa.eager.elements.Transition;
@@ -95,13 +96,13 @@ public class LazyTransition extends Transition {
 	public boolean isMatchTransition() {
 		return (type == LazyTransitionType.REGULAR && super.isMatchTransition());
 	}
-	
+
 	@Override
-	public Double verifyCondition(List<Event> events) {
-		Double condProb = super.verifyCondition(events);
+	public Double verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
+		Double condProb = super.verifyCondition(events, graph);
 		Double temporalCondProb = 1.0;
 		if(temporalCondition != null){
-			temporalCondProb = temporalCondition.verify(events);
+			temporalCondProb = temporalCondition.verify(events,graph);
 		}
 		return condProb*temporalCondProb;
 	}

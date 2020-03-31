@@ -12,8 +12,8 @@ public class LazyMultiInstance extends LazyInstance {
 		super(nfa, initialState);
 	}
 	
-	protected LazyMultiInstance(LazyMultiPatternTreeNFA nfa, LazyMultiState initialState, EventBuffer eventBuffer) {
-		super(nfa, initialState, eventBuffer);
+	protected LazyMultiInstance(LazyMultiPatternTreeNFA nfa, LazyMultiState initialState, EventBuffer eventBuffer, Double matchProb) {
+		super(nfa, initialState, eventBuffer, matchProb);
 	}
 	
 	protected Long getInstanceTimeWindow() {
@@ -22,7 +22,7 @@ public class LazyMultiInstance extends LazyInstance {
 	
 	@Override
 	public LazyMultiInstance clone() {
-		return new LazyMultiInstance((LazyMultiPatternTreeNFA)automaton, (LazyMultiState)currentState, matchBuffer);
+		return new LazyMultiInstance((LazyMultiPatternTreeNFA)automaton, (LazyMultiState)currentState, matchBuffer, matchProbability);
 	}
 	
 	@Override

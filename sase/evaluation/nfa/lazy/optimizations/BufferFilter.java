@@ -2,6 +2,7 @@ package sase.evaluation.nfa.lazy.optimizations;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.evaluation.nfa.lazy.elements.LazyInstance;
 import sase.pattern.condition.Condition;
 import sase.pattern.condition.base.AtomicCondition;
@@ -26,12 +27,12 @@ public class BufferFilter extends BufferPreprocessor {
 			}
 		}
 		
-		public Double applyFilter(Event eventToFilter) { //TODO: make sue with Ilya what is that
+		public Double applyFilter(Event eventToFilter, Payload.ConditionsGraph graph) { //TODO: make sue with Ilya what is that
 			Double filterConditionProb = 1.0;
 			for (AtomicCondition atomicCondition : filterCondition.getAtomicConditions()) {
 				IteratedFilterCondition atomicFilterCondition = (IteratedFilterCondition)atomicCondition;
 				Event externalEventToVerifyWith = conditionToExternalEvent.get(atomicFilterCondition);
-				Double currentFilterConditionProb = atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith);
+				Double currentFilterConditionProb = atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith, graph);
 				if (currentFilterConditionProb > 0.0) {
 					filterConditionProb *= currentFilterConditionProb;
 				} else return 0.0;

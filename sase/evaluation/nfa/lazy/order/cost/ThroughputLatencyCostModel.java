@@ -1,11 +1,11 @@
 package sase.evaluation.nfa.lazy.order.cost;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import sase.base.EventType;
 import sase.config.EventRateConfig;
 import sase.pattern.Pattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThroughputLatencyCostModel extends ThroughputCostModel implements ICostModel {
 	

@@ -1,12 +1,13 @@
 package sase.evaluation.nfa.eager.elements;
 
-import java.util.Arrays;
-import java.util.List;
-
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.pattern.condition.Condition;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Transition {
 	public enum Action {
@@ -66,8 +67,8 @@ public class Transition {
 		return condition.verify(events);
 	}
 	*/
-	public Double verifyCondition(List<Event> events) {
-		return condition.verify(events);
+	public Double verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
+		return condition.verify(events, graph);
 	}
 	
 	public void setSource(NFAState newSource) {

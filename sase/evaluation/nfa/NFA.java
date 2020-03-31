@@ -101,14 +101,17 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 	private List<Instance> processNewEventOnInstance(Event event, Instance instance) {
 		List<Instance> newInstances = new ArrayList<Instance>();
 		for (Transition transition : instance.getCurrentState().getOutgoingTransitions()) {
-			Double transitionProb = instance.isTransitionPossible(event, transition);
+			Instance instanceCopy = instance.cloneWithEvents();
+			Event copy = event.clone();
+			Double transitionProb = instanceCopy.isTransitionPossible(copy, transition);
 			if (transitionProb <= 0.0)
 				continue;
-
-			Instance newInstance = instance.clone();
-			newInstance.updateProb(transitionProb);
+			instance = instanceCopy.cloneWithEvents();
+			Instance newInstance = instanceCopy.clone();
+			//newInstance.updateProb(transitionProb);
 			newInstances.add(newInstance);
-			newInstance.executeTransition(event, transition);
+			//newInstances.add(oldInstance);
+			newInstance.executeTransition(copy, transition);
 			newInstances.addAll(executeEmptyTransitions(newInstance));
 		}
 		return newInstances;
@@ -218,9 +221,11 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 		}
 		// the evaluation was completed - the instance should be removed
 		// regardless of success
+		Double matchProb = instance.getMatchProb();
+		if(matchProb <= 0.0) return false;
 		if (actualMatch != null && instance.shouldReportMatch()) {
 			// an actual match was detected
-			actualMatch.updateMatchConditionsProb(instance.getProb());
+			actualMatch.updateMatchConditionsProb(matchProb);
 			listOfMatches.add(actualMatch);
 		}
 		if (listOfInstancesToBeRemoved != null && instance.shouldDiscardWithMatch()) {

@@ -3,6 +3,7 @@ package sase.evaluation.nfa.eager;
 import sase.base.Event;
 import sase.base.EventSelectionStrategies;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.evaluation.common.Match;
 import sase.evaluation.nfa.eager.elements.Instance;
@@ -256,7 +257,8 @@ public class AND_SEQ_NFA extends AND_NFA {
 		return null;
 	}
 	
-	private boolean verifySingleNegativeEventType(Match match, CNFCondition condition, EventType negativeEventType) {
+	private boolean verifySingleNegativeEventType(Match match, CNFCondition condition, EventType negativeEventType,
+												  Payload.ConditionsGraph graph) {
 		//copying the list since we're going to modify it by adding negative events
 		List<Event> positiveEvents = new ArrayList<Event>(match.getPrimitiveEvents());
 		List<EventType> listForNegativeEventType = new ArrayList<EventType>();
@@ -266,7 +268,7 @@ public class AND_SEQ_NFA extends AND_NFA {
 		conditionToVerify.addAtomicConditions(negativeTemporalConditions.get(negativeEventType));
 		for (Event negativeEvent : negatedEventsBuffer.getTypeBuffer(negativeEventType)) {
 			positiveEvents.add(0, negativeEvent);
-			if (conditionToVerify.verify(positiveEvents) <= 0.0) {
+			if (conditionToVerify.verify(positiveEvents, graph) <= 0.0) {
 				//negative event found - we should invalidate this match
 				return false;
 			}
@@ -286,7 +288,8 @@ public class AND_SEQ_NFA extends AND_NFA {
 			return null;
 		CNFCondition mainCondition = (CNFCondition)pattern.getCondition();
 		for (EventType negativeEventType : negativeTypes) {
-			if (!(verifySingleNegativeEventType(initialMatch, mainCondition, negativeEventType))) {
+			if (!(verifySingleNegativeEventType(initialMatch, mainCondition, negativeEventType,
+					instance.getGraphFromMatchBuffer()))) { //TODO:check if this correct
 				return null;
 			}
 		}

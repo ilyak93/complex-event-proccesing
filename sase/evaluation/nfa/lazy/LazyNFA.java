@@ -1,9 +1,6 @@
 package sase.evaluation.nfa.lazy;
 
-import sase.base.AggregatedEvent;
-import sase.base.Event;
-import sase.base.EventSelectionStrategies;
-import sase.base.EventType;
+import sase.base.*;
 import sase.config.MainConfig;
 import sase.evaluation.common.Match;
 import sase.evaluation.nfa.NFA;
@@ -51,11 +48,11 @@ public abstract class LazyNFA extends NFA {
 		return rejectingState;
 	}
 	
-	public Double verifyContiguityConditions(Event firstEvent, Event secondEvent) {
+	public Double verifyContiguityConditions(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		if (contiguityVerifier == null) {
 			return 1.0;
 		}
-		return contiguityVerifier.verify(Arrays.asList(new Event[] {firstEvent, secondEvent}));
+		return contiguityVerifier.verify(Arrays.asList(new Event[] {firstEvent, secondEvent}), graph);
 	}
 
 	private List<List<EventType>> getSequencesWithBoundEventType(EventType eventType) {

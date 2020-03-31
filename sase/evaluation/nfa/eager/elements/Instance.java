@@ -2,6 +2,7 @@ package sase.evaluation.nfa.eager.elements;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.evaluation.common.EventBuffer;
 import sase.evaluation.common.Match;
 import sase.evaluation.nfa.NFA;
@@ -20,14 +21,14 @@ public class Instance {
 
 
 	public Instance(NFA nfa, NFAState initialState) {
-		this(nfa, initialState, null);
+		this(nfa, initialState, null, 1.0);
 	}
 
-	public Instance(NFA nfa, NFAState initialState, EventBuffer eventBuffer) {
+	public Instance(NFA nfa, NFAState initialState, EventBuffer eventBuffer, Double matchProb) {
 		automaton = nfa;
 		currentState = initialState;
 		matchBuffer = eventBuffer == null ? new EventBuffer(automaton.getIterativeTypes()) : eventBuffer.clone();
-		matchProbability = 1.0;
+		matchProbability = matchProb;
 		shouldGenerateInputBufferReadyEvent = false;
 		shouldInvalidate = false;
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteMemoryStatistic(Statistics.instanceCreations);
@@ -41,6 +42,10 @@ public class Instance {
 		this.matchProbability *= newProb;
 	}
 
+	public Double getMatchProb(){
+		return this.matchBuffer.getGraph().computeProbability();
+	}
+
 	public NFAState getCurrentState() {
 		return currentState;
 	}
@@ -51,6 +56,10 @@ public class Instance {
 	
 	public List<Event> getEventsFromMatchBuffer() {
 		return matchBuffer.getEvents();
+	}
+
+	public Payload.ConditionsGraph getGraphFromMatchBuffer() {
+		return matchBuffer.getGraph();
 	}
 	
 	public Event getMatchBufferEventByType(EventType type) {
@@ -95,7 +104,8 @@ public class Instance {
 			return -1.0;
 		EventBuffer bufferOfEventsToVerify = matchBuffer.clone();
 		bufferOfEventsToVerify.addEvent(event);
-		return transition.verifyCondition(bufferOfEventsToVerify.getEvents());
+		return transition.verifyCondition(bufferOfEventsToVerify.getEvents(),
+				bufferOfEventsToVerify.getGraph());
 	}
 
 	protected void executeMatchBufferTransition(Event event) {
@@ -127,7 +137,11 @@ public class Instance {
 	
 	@Override
 	public Instance clone() {
-		return new Instance(automaton, currentState, matchBuffer);
+		return new Instance(automaton, currentState, matchBuffer, matchProbability);
+	}
+
+	public Instance cloneWithEvents() {
+		return new Instance(automaton, currentState, matchBuffer.cloneWithEvents(), matchProbability);
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package sase.evaluation.nfa.lazy.elements;
 
 import sase.base.Event;
 import sase.base.EventSelectionStrategies;
+import sase.base.Payload;
 import sase.config.MainConfig;
 import sase.evaluation.common.EventBuffer;
 import sase.evaluation.nfa.NFA;
@@ -18,11 +19,11 @@ public class LazyInstance extends Instance {
 	private final EfficientInputBuffer lastAggregatedEvents;
 	
 	public LazyInstance(LazyNFA nfa, NFAState initialState) {
-		this(nfa, initialState, null);
+		this(nfa, initialState, null, 1.0);
 	}
 	
-	protected LazyInstance(LazyNFA nfa, NFAState initialState, EventBuffer eventBuffer) {
-		super(nfa, initialState, eventBuffer);
+	protected LazyInstance(LazyNFA nfa, NFAState initialState, EventBuffer eventBuffer, Double matchProb) {
+		super(nfa, initialState, eventBuffer, matchProb);
 		shouldStoreCurrentEvent = false;
 		shouldStopEvaluation = false;
 		lastAggregatedEvents = nfa.shouldActivateUnboundedIterativeMode() ? 
@@ -102,15 +103,18 @@ public class LazyInstance extends Instance {
 		}
 	}
 	
-	private Double isRegularTransitionPossible(Event event, LazyTransition transition) {
+	private Double isRegularTransitionPossible(Event event, LazyTransition transition,
+											   Payload.ConditionsGraph graph) {
 		if (MainConfig.selectionStrategy == EventSelectionStrategies.CONTUGUITY) {
 			LazyNFA lazyNfa = (LazyNFA)automaton;
 			Event precedingEvent = transition.getActualPrecedingEvent(getEventsFromMatchBuffer());
-			if (precedingEvent != null && lazyNfa.verifyContiguityConditions(event, precedingEvent) <= 0.0) {
+			if (precedingEvent != null && lazyNfa.verifyContiguityConditions(event, precedingEvent,
+					graph) <= 0.0) {
 				return 0.0;
 			}
 			Event succeedingEvent = transition.getActualSucceedingEvent(getEventsFromMatchBuffer());
-			if (succeedingEvent != null && lazyNfa.verifyContiguityConditions(event, succeedingEvent) <= 0.0) {
+			if (succeedingEvent != null && lazyNfa.verifyContiguityConditions(event, succeedingEvent,
+					graph) <= 0.0) {
 				return 0.0;
 			}
 		}
@@ -122,7 +126,7 @@ public class LazyInstance extends Instance {
 		LazyTransition lazyTransition = (LazyTransition)transition;
 		switch(lazyTransition.getType()) {
 			case REGULAR:
-				return isRegularTransitionPossible(event, lazyTransition);
+				return isRegularTransitionPossible(event, lazyTransition,getGraphFromMatchBuffer());
 			case SEARCH_FAILED:
 				return 1.0; //we assume this type of edge to only be traversed when all conditions hold
 			case TIMEOUT:
@@ -134,6 +138,6 @@ public class LazyInstance extends Instance {
 	
 	@Override
 	public LazyInstance clone() {
-		return new LazyInstance((LazyNFA)automaton, currentState, matchBuffer);
+		return new LazyInstance((LazyNFA)automaton, currentState, matchBuffer, matchProbability);
 	}
 }
