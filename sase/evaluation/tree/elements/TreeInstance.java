@@ -1,6 +1,7 @@
 package sase.evaluation.tree.elements;
 
 import sase.base.Event;
+import sase.base.Payload;
 import sase.evaluation.common.EventBuffer;
 import sase.evaluation.common.Match;
 import sase.evaluation.tree.TreeEvaluationMechanism;
@@ -86,6 +87,10 @@ public class TreeInstance {
 
 	protected TreeInstance createInstanceForNodeAndBuffer(TreeEvaluationMechanism tree, Node node, EventBuffer buffer) {
 		return new TreeInstance(tree, node, buffer);
+	}
+
+	public Payload.ConditionsGraph getGraphFromMatchBuffer() {
+		return matchBuffer.getGraph();
 	}
 	
 	public void addEvent(Event event) {

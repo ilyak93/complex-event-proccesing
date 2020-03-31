@@ -2,6 +2,7 @@ package sase.evaluation.tree.elements.node;
 
 import sase.base.Event;
 import sase.base.EventType;
+import sase.base.Payload;
 import sase.evaluation.tree.elements.TreeInstance;
 import sase.pattern.condition.base.CNFCondition;
 import sase.pattern.condition.time.PairTemporalOrderCondition;
@@ -39,9 +40,10 @@ public class NSeqInternalNode extends SeqInternalNode {
 		return negativeCondition;
 	}
 	
-	private boolean validateNegativeCondition(List<Event> positiveEvents, Event negativeEvent) {
+	private boolean validateNegativeCondition(List<Event> positiveEvents, Event negativeEvent,
+											  Payload.ConditionsGraph graph) {
 		positiveEvents.add(0, negativeEvent);
-		if (negativeCondition.verify(positiveEvents) <= 0.0) {
+		if (negativeCondition.verify(positiveEvents, graph) <= 0.0) {
 			return false;
 		}
 		positiveEvents.remove(0);//restore the match buffer
@@ -59,7 +61,7 @@ public class NSeqInternalNode extends SeqInternalNode {
 		}
 		List<Event> negativeEvents = treeInstance.getEvaluationMechanism().getNegativeBuffer().getTypeBuffer(negativeEventType);
 		for (Event negativeEvent : negativeEvents) {
-			if (!validateNegativeCondition(treeInstance.getEvents(), negativeEvent)) {
+			if (!validateNegativeCondition(treeInstance.getEvents(), negativeEvent, treeInstance.getGraphFromMatchBuffer())) {
 				return 0.0;
 			}
 		}

@@ -106,7 +106,7 @@ public abstract class Node extends State {
 		if (nodeCondition == null) {
 			return 0.0;
 		}
-		return nodeCondition.verify(treeInstance.getEvents());
+		return nodeCondition.verify(treeInstance.getEvents(), treeInstance.getGraphFromMatchBuffer());
 	}
 	
 	public List<Node> getPeers() {
