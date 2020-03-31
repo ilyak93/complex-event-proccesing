@@ -45,4 +45,16 @@ public class DeterministicPayload extends Payload {
         return "value="+value+" probability="+"1.0";
     }
 
+    @Override
+    public void updatePayload(Object payloadValue) {}
+
+    @Override
+    public Boolean contains(Object o) {
+        return null;
+    }
+
+    @Override
+    public Payload clone() {
+        return new DeterministicPayload(this.value);
+    }
 }

@@ -20,10 +20,25 @@ public class DiscreteDistributionPayload extends Payload {
                     Double.parseDouble(valueProb[0]),
                     Double.parseDouble(valueProb[1])));
         }
+        this.setLeftestOperand(this);
+        this.setRightestOperand(this);
 
     }
 
     //public DiscreteDistributionPayload(){}
+
+    private DiscreteDistributionPayload(DiscreteDistributionPayload ddp){
+        List<Pair<Double, Double>> newValuesProbabilities =
+                new LinkedList<>();
+        for(Pair<Double, Double> p : ddp.valuesProbabilities){
+            Pair<Double, Double> newPair = new Pair(p.getKey(), p.getValue());
+            newValuesProbabilities.add(newPair);
+        }
+        this.valuesProbabilities = newValuesProbabilities;
+        this.leftestOperand = this;
+        this.rightestOperand = this;
+
+    }
 
     public DiscreteDistributionPayload(DeterministicPayload dPayload){
         valuesProbabilities = new LinkedList<Pair<Double,Double>>();
@@ -34,6 +49,11 @@ public class DiscreteDistributionPayload extends Payload {
         valuesProbabilities = pairList;
     }
 
+    /*
+    public DiscreteDistributionPayload(DiscreteDistributionPayload DDP){
+        valuesProbabilities = DDP.valuesProbabilities.;
+    }
+    */
     //TODO: implemet overriden methods
     @Override
     public Iterator iterator() {
@@ -57,5 +77,29 @@ public class DiscreteDistributionPayload extends Payload {
 
     public void setValue(List<Pair<Double, Double>> valuesProbabilities) {
         this.valuesProbabilities = new LinkedList<Pair<Double, Double>>(valuesProbabilities);
+    }
+
+    public void addValue(Pair<Double, Double> pair){
+        this.valuesProbabilities.add(pair);
+        //TODO: assert probabilities > 1.0, maintain sum of probabilities;
+    }
+
+    @Override
+    public void updatePayload(Object payloadValue) {
+        valuesProbabilities.removeIf(p -> p == payloadValue);
+    }
+
+    @Override
+    public Boolean contains(Object o) {
+        Pair<Double, Double> toFind = (Pair<Double, Double>) o;
+        for(Pair<Double, Double> p : this.valuesProbabilities){
+            if(p.getKey() == toFind.getKey() && p.getValue() == toFind.getValue()) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Payload clone() {
+        return new DiscreteDistributionPayload(this);
     }
 }

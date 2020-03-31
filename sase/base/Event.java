@@ -41,6 +41,22 @@ public class Event implements Comparable<Event> {
 		this.payload = payload == null ? null :
 				EventTypesManager.getInstance().convertStringPayloadToObjectPayload(payload);
 	}
+
+	private Event(Event e){
+		this.sequenceNumber = e.sequenceNumber;
+		this.type = e.type;
+		this.prob = e.prob;
+		this.systemTimestamp = e.systemTimestamp;
+		Object[] newPayload = new Object[e.payload.length];
+		for(int i = 0; i < e.payload.length; i++) {
+			if(e.payload[i] instanceof Payload){
+				newPayload[i] = ((Payload)e.payload[i]).clone();
+			} else {
+				newPayload[i] = e.payload[i]; //if other complicated payload, need to implement appropriate clone
+			}
+		}
+		this.payload = newPayload;
+	}
 	
 	public EventType getType() {
 		return type;
@@ -93,6 +109,10 @@ public class Event implements Comparable<Event> {
 	}
 
 	public double getProb() { return prob;	}
+
+	public Event clone(){
+		return new Event(this);
+	}
 
 
 	@Override
