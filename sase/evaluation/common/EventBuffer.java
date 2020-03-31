@@ -1,27 +1,31 @@
 package sase.evaluation.common;
 
-import sase.base.AggregatedEvent;
-import sase.base.Event;
-import sase.base.EventType;
+import javafx.util.Pair;
+import sase.base.*;
 import sase.pattern.EventTypesManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventBuffer {
 
 	private final List<Event> events;
 	private final HashMap<EventType, AggregatedEvent> typeToAggregatedEvent;
+	Payload.ConditionsGraph graph;
 	private Long earliestTimestamp = null;
 	private Long latestTimestamp = null;
+
 	
 	public EventBuffer(List<EventType> iterativeEventTypes) {
-		this(iterativeEventTypes, null);
+		this(iterativeEventTypes, null, new Payload.ConditionsGraph());
 	}
 	
-	public EventBuffer(List<EventType> iterativeEventTypes, List<Event> events) {
+	public EventBuffer(List<EventType> iterativeEventTypes, List<Event> events,
+					   Payload.ConditionsGraph graph) {
 		this.events = (events == null) ? new ArrayList<Event>() : events;
+		this.graph = graph;
 		if (events != null) {
 			for (Event event : events) {
 				updateSystemTimestamps(event);
@@ -35,7 +39,7 @@ public class EventBuffer {
 			typeToAggregatedEvent.put(eventType, null);
 		}
 	}
-	
+
 	private void addPrimitiveEvent(Event event) {
 		EventType eventType = event.getType();
 		if (typeToAggregatedEvent.containsKey(eventType)) {
@@ -108,6 +112,10 @@ public class EventBuffer {
 		}
 		return null;
 	}
+
+	public Payload.ConditionsGraph getGraph(){
+		return this.graph;
+	}
 	
 	@Override
 	public EventBuffer clone() {
@@ -119,7 +127,7 @@ public class EventBuffer {
 				clonedEventBuffer.typeToAggregatedEvent.put(event.getType(), clonedEvent);
 			}
 			else {
-				clonedEventBuffer.events.add(event);
+				clonedEventBuffer.events.add(event); //TODO: worked last this line
 			}
 		}
 		for (EventType aggregatedEventType : typeToAggregatedEvent.keySet()) {
@@ -129,6 +137,53 @@ public class EventBuffer {
 		}
 		clonedEventBuffer.setEarliestTimestamp(earliestTimestamp);
 		clonedEventBuffer.setLatestTimestamp(latestTimestamp);
+		clonedEventBuffer.graph = this.graph;
+		return clonedEventBuffer;
+	}
+
+	public EventBuffer cloneWithEvents() {
+		EventBuffer clonedEventBuffer = new EventBuffer(null);
+		Map<Pair<Object, Payload>, Pair<Object, Payload>>
+				originClonePairs = new HashMap<>();
+		for (Event event : events) {
+			if (event instanceof AggregatedEvent) {
+				AggregatedEvent clonedEvent = ((AggregatedEvent)event).clone();
+				clonedEventBuffer.events.add(clonedEvent);
+				clonedEventBuffer.typeToAggregatedEvent.put(event.getType(), clonedEvent);
+			}
+			else {
+				Event clone = event.clone();
+				clonedEventBuffer.events.add(clone); //TODO: worked last this line
+				Object[] originAttributes = event.getAttributes();
+				Object[] cloneAttributes = clone.getAttributes();
+				for(int i = 0; i < 4; i++){ //TODO: change it back to all attributes
+						if (cloneAttributes[i] instanceof DiscreteDistributionPayload) {
+							DiscreteDistributionPayload pl1 =
+									(DiscreteDistributionPayload) originAttributes[i];
+							List<Pair<Double, Double>> oldValuesProbs = pl1.getValue();
+							DiscreteDistributionPayload pl2 =
+									(DiscreteDistributionPayload) cloneAttributes[i];
+							List<Pair<Double, Double>> newValuesProbs = pl2.getValue();
+							for(int j = 0; j < oldValuesProbs.size(); j++) {
+								originClonePairs.put(
+										new Pair(oldValuesProbs.get(j),
+												originAttributes[i]),
+										new Pair(newValuesProbs.get(j),
+												cloneAttributes[i]));
+							}
+						}
+					}
+				}
+		}
+		Payload.ConditionsGraph newGraph = this.graph.clone(originClonePairs);
+		for (EventType aggregatedEventType : typeToAggregatedEvent.keySet()) {
+			if (!clonedEventBuffer.typeToAggregatedEvent.containsKey(aggregatedEventType)) {
+				clonedEventBuffer.typeToAggregatedEvent.put(aggregatedEventType, null);
+			}
+		}
+		clonedEventBuffer.setEarliestTimestamp(earliestTimestamp);
+		clonedEventBuffer.setLatestTimestamp(latestTimestamp);
+		clonedEventBuffer.graph = newGraph;
 		return clonedEventBuffer;
 	}
 	
