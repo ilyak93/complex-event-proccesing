@@ -87,7 +87,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 		}
 		TreeInstance leafInstance = createLeafInstance(leafForEvent);
 		leafInstance.addEvent(event);
-		if (leafInstance.validateNodeCondition() <= 0.0) {
+		if (!leafInstance.validateNodeCondition()) {
 			return storage.getMatches();
 		}
 		if (isIterativeInstance(leafInstance)) {
@@ -150,7 +150,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 					continue;
 				}
 				TreeInstance parentInstance = currentInstance.createParentInstance(peerInstance);
-				if (parentInstance.validateNodeCondition() > 0.0) {
+				if (parentInstance.validateNodeCondition()) {
 					instanceQueue.add(parentInstance);
 				}
 			}
@@ -177,7 +177,7 @@ public class TreeEvaluationMechanism implements IEvaluationMechanism, IEvaluatio
 			newIterativeInstances.add(leafInstance);
 			for (TreeInstance treeInstance : iterativeInstances) {
 				TreeInstance newInstance = treeInstance.createExtendedAggregatedLeafInstance(currentEvent);
-				if (newInstance.validateNodeCondition() >= 0.0) {
+				if (newInstance.validateNodeCondition()) {
 					newIterativeInstances.add(newInstance);
 				}
 			}

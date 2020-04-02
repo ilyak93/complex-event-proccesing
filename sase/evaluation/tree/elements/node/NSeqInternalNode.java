@@ -43,7 +43,7 @@ public class NSeqInternalNode extends SeqInternalNode {
 	private boolean validateNegativeCondition(List<Event> positiveEvents, Event negativeEvent,
 											  Payload.ConditionsGraph graph) {
 		positiveEvents.add(0, negativeEvent);
-		if (negativeCondition.verify(positiveEvents, graph) <= 0.0) {
+		if (!negativeCondition.verify(positiveEvents, graph)) {
 			return false;
 		}
 		positiveEvents.remove(0);//restore the match buffer
@@ -55,17 +55,17 @@ public class NSeqInternalNode extends SeqInternalNode {
 	}
 	
 	@Override
-	public Double isNodeConditionSatisfied(TreeInstance treeInstance) {
-		if (super.isNodeConditionSatisfied(treeInstance) <= 0.0) {
-			return 0.0;
+	public Boolean isNodeConditionSatisfied(TreeInstance treeInstance) {
+		if (!super.isNodeConditionSatisfied(treeInstance)) {
+			return false;
 		}
 		List<Event> negativeEvents = treeInstance.getEvaluationMechanism().getNegativeBuffer().getTypeBuffer(negativeEventType);
 		for (Event negativeEvent : negativeEvents) {
 			if (!validateNegativeCondition(treeInstance.getEvents(), negativeEvent, treeInstance.getGraphFromMatchBuffer())) {
-				return 0.0;
+				return false;
 			}
 		}
-		return 1.0;
+		return true;
 	}
 	
 	@Override

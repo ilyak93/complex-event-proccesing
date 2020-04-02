@@ -127,7 +127,7 @@ public class EventBuffer {
 				clonedEventBuffer.typeToAggregatedEvent.put(event.getType(), clonedEvent);
 			}
 			else {
-				clonedEventBuffer.events.add(event); //TODO: worked last this line
+				clonedEventBuffer.events.add(event);
 			}
 		}
 		for (EventType aggregatedEventType : typeToAggregatedEvent.keySet()) {
@@ -143,7 +143,7 @@ public class EventBuffer {
 
 	public EventBuffer cloneWithEvents() {
 		EventBuffer clonedEventBuffer = new EventBuffer(null);
-		Map<Pair<Object, Payload>, Pair<Object, Payload>>
+		Map<Pair<Payload.PayloadValue, Payload>, Pair<Payload.PayloadValue, Payload>>
 				originClonePairs = new HashMap<>();
 		for (Event event : events) {
 			if (event instanceof AggregatedEvent) {
@@ -153,10 +153,10 @@ public class EventBuffer {
 			}
 			else {
 				Event clone = event.clone();
-				clonedEventBuffer.events.add(clone); //TODO: worked last this line
+				clonedEventBuffer.events.add(clone);
 				Object[] originAttributes = event.getAttributes();
 				Object[] cloneAttributes = clone.getAttributes();
-				for(int i = 0; i < 4; i++){ //TODO: change it back to all attributes
+				for(int i = 0; i < originAttributes.length; i++){ //TODO: changed to all attributes V
 						if (cloneAttributes[i] instanceof DiscreteDistributionPayload) {
 							DiscreteDistributionPayload pl1 =
 									(DiscreteDistributionPayload) originAttributes[i];

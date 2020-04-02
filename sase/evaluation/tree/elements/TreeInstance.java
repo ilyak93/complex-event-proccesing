@@ -98,7 +98,7 @@ public class TreeInstance {
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteMemoryStatistic(Statistics.bufferInsertions);
 	}
 	
-	public Double validateNodeCondition() {
+	public Boolean validateNodeCondition() {
 		return currentNode.isNodeConditionSatisfied(this);
 	}
 	

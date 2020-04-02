@@ -102,9 +102,9 @@ public abstract class Node extends State {
 		return nodeCondition;
 	}
 	
-	public Double isNodeConditionSatisfied(TreeInstance treeInstance) {
+	public Boolean isNodeConditionSatisfied(TreeInstance treeInstance) {
 		if (nodeCondition == null) {
-			return 0.0;
+			return false;
 		}
 		return nodeCondition.verify(treeInstance.getEvents(), treeInstance.getGraphFromMatchBuffer());
 	}
