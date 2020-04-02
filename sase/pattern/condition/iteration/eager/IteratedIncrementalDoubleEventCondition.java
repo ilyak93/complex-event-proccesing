@@ -17,7 +17,7 @@ public class IteratedIncrementalDoubleEventCondition extends IteratedIncremental
 	}
 
 	@Override
-	public Double verifyAdjacentEvents(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
+	public Boolean verifyAdjacentEvents(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(firstEvent);
 		eventsToVerify.add(secondEvent);

@@ -18,21 +18,19 @@ public class GroupByAttributeCondition extends IteratedEventInternalCondition {
 	}
 
 	@Override
-	protected Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
+	protected Boolean verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return 1.0;
+			return true;
 		}
 		Object attributeValue = primitiveEvents.get(0).getAttributeValue(attributeIndex);
-		Double aggregatedProb = 1.0;
 		for (int i = 1; i < primitiveEvents.size(); ++i) {
-			Object valueToCompare = primitiveEvents.get(i).getAttributeValue(attributeIndex);//TODO: use our types and functions
-			Double curPrimitiveEventConditionProb = 1.0; //attributeValue.equals(valueToCompare);
-			if(curPrimitiveEventConditionProb > 0.0){
-				aggregatedProb *= curPrimitiveEventConditionProb;
-			} else return 0.0;
+			Object valueToCompare = primitiveEvents.get(i).getAttributeValue(attributeIndex);
+			if (!attributeValue.equals(valueToCompare)) {
+				return false;
+			}
 		}
-		return aggregatedProb;
+		return true;
 	}
 
 	public int getAttributeIndex() {

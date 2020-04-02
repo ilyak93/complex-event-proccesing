@@ -49,23 +49,23 @@ public class EventTemporalPositionCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		Event targetEvent = getEventByType(events, targetEventType);
 		if (targetEvent == null)
 			throw new RuntimeException("Cannot verify condition - the target event was not found.");
 		for (EventType eventType : precedingEventTypes) {
 			Event precedingEvent = getEventByType(events, eventType);
 			if (isEarlier(targetEvent, precedingEvent)) {
-				return 0.0;
+				return false;
 			}
 		}
 		for (EventType eventType : succeedingEventTypes) {
 			Event succeedingEvent = getEventByType(events, eventType);
 			if (isEarlier(succeedingEvent, targetEvent)) {
-				return 0.0;
+				return false;
 			}
 		}
-		return 1.0;
+		return true;
 	}
 	
 	public Event getActualPrecedingEvent(List<Event> events) {

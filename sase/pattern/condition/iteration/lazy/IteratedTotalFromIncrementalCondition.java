@@ -26,26 +26,24 @@ public class IteratedTotalFromIncrementalCondition extends IteratedEventInternal
 	}
 
 	@Override
-	protected Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
+	protected Boolean verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
 		//we decrease this statistic by one since this condition invokes an internal condition, which increases
 		//this counter again
 		Environment.getEnvironment().getStatisticsManager().decrementDiscreteStatistic(Statistics.computations);
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return 1.0;
+			return true;
 		}
 		Event prevEvent = null;
-		Double incrementalProb = 1.0;
 		for (Event primitiveEvent : primitiveEvents) {
 			if (prevEvent != null) {
-				Double currentiIncrementalProb = incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent, graph);
-				if(currentiIncrementalProb > 0.0){
-					incrementalProb *= currentiIncrementalProb;
-				} else return 0.0;
+				if (!(incrementalCondition.verifyAdjacentEvents(prevEvent, primitiveEvent, graph))) {
+					return false;
+				}
 			}
 			prevEvent = primitiveEvent;
 		}
-		return incrementalProb;
+		return true;
 	}
 
 	@Override

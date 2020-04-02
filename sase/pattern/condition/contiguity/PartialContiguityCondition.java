@@ -19,7 +19,7 @@ public class PartialContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (events.size() != 2) {
 			throw new RuntimeException(String.format("Unexpected number of events: %d", events.size()));
 		}
@@ -30,8 +30,7 @@ public class PartialContiguityCondition extends AtomicCondition {
 		if (firstIndex == -1 || secondIndex == -1) {
 			throw new RuntimeException(String.format("Events not found: %s %s", firstEvent, secondEvent));
 		}
-		Double result = (double) (firstIndex - secondIndex - (firstEvent.getSequenceNumber() - secondEvent.getSequenceNumber()));
-		return result == 0.0 ? 1.0 : 0.0;
+		return firstIndex - secondIndex == (firstEvent.getSequenceNumber() - secondEvent.getSequenceNumber());
 	}
 
 	@Override

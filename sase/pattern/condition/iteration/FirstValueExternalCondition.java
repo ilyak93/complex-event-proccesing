@@ -17,10 +17,10 @@ public class FirstValueExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+	protected Boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
 														 Payload.ConditionsGraph graph) {
 		if (internalEvents.isEmpty()) {
-			return 0.0;
+			return false;
 		}
 		List<Event> eventsToVerify = new ArrayList<Event>();
 		eventsToVerify.add(internalEvents.get(0));

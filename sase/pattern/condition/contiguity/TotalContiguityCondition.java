@@ -16,9 +16,9 @@ public class TotalContiguityCondition extends AtomicCondition {
 	}
 
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (events.size() < 2) {
-			return 1.0;
+			return true;
 		}
 		List<Event> orderedEvents = new ArrayList<Event>(events);
 		orderedEvents.sort(null);
@@ -26,10 +26,10 @@ public class TotalContiguityCondition extends AtomicCondition {
 			long firstSequenceNumber = orderedEvents.get(i).getSequenceNumber();
 			long secondSequenceNumber = orderedEvents.get(i+1).getSequenceNumber();
 			if (firstSequenceNumber != secondSequenceNumber - 1) {
-				return 0.0;
+				return false;
 			}
 		}
-		return 1.0;
+		return true;
 	}
 
 	@Override

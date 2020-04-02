@@ -11,8 +11,8 @@ import java.util.List;
 public class TrivialCondition extends AtomicCondition {
 
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
-		return 1.0;
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+		return true;
 	}
 	
 	@Override

@@ -15,8 +15,8 @@ public abstract class IteratedEventExternalCondition extends DoubleEventConditio
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
-                                       Payload.ConditionsGraph graph) {
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
+										Payload.ConditionsGraph graph) {
 		if (firstEvent instanceof AggregatedEvent) {
 			return verifyListOfEventsWithExternalEvent(((AggregatedEvent)firstEvent).getPrimitiveEvents(), 
 													   secondEvent, graph);
@@ -30,6 +30,6 @@ public abstract class IteratedEventExternalCondition extends DoubleEventConditio
 						firstEvent, secondEvent));
 	}
 
-	protected abstract Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+	protected abstract Boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
 																  Payload.ConditionsGraph graph);
 }

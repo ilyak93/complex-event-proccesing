@@ -70,14 +70,12 @@ public class CNFCondition extends Condition {
 	}
 	*/
 	@Override
-	public Double verify(List<Event> events, Payload.ConditionsGraph graph) {
-		Double condProb = 1.0;
-		for (AtomicCondition condition : atomicConditions) {
-			Double current_condition_prob = condition.verify(events, graph);;
-			if(current_condition_prob <= 0.0) return current_condition_prob;
-			condProb *= current_condition_prob;
+	public boolean verify(List<Event> events, Payload.ConditionsGraph graph) {
+		for (AtomicCondition condition : atomicConditions) { //TODO: rollback if once false, clone it before
+			if (!(condition.verify(events, graph)))
+				return false;
 		}
-		return condProb;
+		return true;
 	}
 	
 	public List<AtomicCondition> getAtomicConditions() {

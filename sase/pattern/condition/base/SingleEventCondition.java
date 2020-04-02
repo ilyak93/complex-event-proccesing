@@ -22,19 +22,19 @@ public abstract class SingleEventCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		for (Event event : events) {
 			if (event.getType() == type) {
 				Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.computations);
 				return verifySingleEvent(event, graph);
 			}
 		}
-		return 0.0;
+		return false;
 	}
 	
 	public EventType getType() {
 		return type;
 	}
 
-	protected abstract Double verifySingleEvent(Event event, Payload.ConditionsGraph graph);
+	protected abstract Boolean verifySingleEvent(Event event, Payload.ConditionsGraph graph);
 }

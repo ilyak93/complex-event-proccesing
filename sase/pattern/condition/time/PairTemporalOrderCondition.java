@@ -17,10 +17,10 @@ public class PairTemporalOrderCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
 									   Payload.ConditionsGraph graph) {
-		if(firstEvent.getSequenceNumber() < secondEvent.getSequenceNumber()) return 1.0;
-		return 0.0;
+		if(firstEvent.getSequenceNumber() < secondEvent.getSequenceNumber()) return true;
+		return false;
 	}
 	
 	@Override

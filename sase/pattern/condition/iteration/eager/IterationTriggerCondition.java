@@ -14,7 +14,7 @@ import java.util.List;
 public class IterationTriggerCondition extends IteratedEventExternalCondition {
 
 	private DoubleEventCondition triggerCondition;
-	private HashMap<Event, Double> triggerConditionVerificationCache = null;
+	private HashMap<Event, Boolean> triggerConditionVerificationCache = null;
 	
 	public IterationTriggerCondition(DoubleEventCondition triggerCondition) {
 		super(triggerCondition.getLeftEventType(), triggerCondition.getRightEventType());
@@ -22,7 +22,7 @@ public class IterationTriggerCondition extends IteratedEventExternalCondition {
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+	protected Boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
 														 Payload.ConditionsGraph graph) {
 		//we decrease this statistic by one since this condition invokes an internal condition, which increases
 		//this counter again
@@ -39,7 +39,7 @@ public class IterationTriggerCondition extends IteratedEventExternalCondition {
 		//non-iterated event first (intuitively, it goes 'before' the iterated one)
 		eventsToVerifyWithTriggerCondition.add(externalEvent);
 		eventsToVerifyWithTriggerCondition.add(leadingEvent);
-		Double result = triggerCondition.verify(eventsToVerifyWithTriggerCondition, graph);
+		Boolean result = triggerCondition.verify(eventsToVerifyWithTriggerCondition, graph);
 		if (isCacheEnabled()) {
 			triggerConditionVerificationCache.put(leadingEvent, result);
 		}
@@ -47,7 +47,7 @@ public class IterationTriggerCondition extends IteratedEventExternalCondition {
 	}
 	
 	public void enableCache() {
-		triggerConditionVerificationCache = new HashMap<Event, Double>();
+		triggerConditionVerificationCache = new HashMap<Event, Boolean>();
 	}
 
 	public void disableCache() {

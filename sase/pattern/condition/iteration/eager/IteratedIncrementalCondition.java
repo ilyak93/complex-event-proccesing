@@ -15,15 +15,15 @@ public abstract class IteratedIncrementalCondition extends IteratedEventInternal
 	}
 
 	@Override
-	protected Double verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
+	protected Boolean verifyAggregatedEvent(AggregatedEvent event, Payload.ConditionsGraph graph) {
 		List<Event> primitiveEvents = event.getPrimitiveEvents();
 		if (primitiveEvents.size() < 2) {
-			return 1.0;
+			return true;
 		}
 		Event lastEvent = primitiveEvents.get(primitiveEvents.size() - 1);
 		Event eventBeforeLast = primitiveEvents.get(primitiveEvents.size() - 2);
 		return verifyAdjacentEvents(lastEvent, eventBeforeLast, graph);
 	}
 
-	public abstract Double verifyAdjacentEvents(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph);
+	public abstract Boolean verifyAdjacentEvents(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph);
 }

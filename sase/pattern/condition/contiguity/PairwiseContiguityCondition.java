@@ -22,10 +22,9 @@ public class PairwiseContiguityCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
                                        Payload.ConditionsGraph graph) {
-		Double result = (double)(firstEvent.getSequenceNumber() - (secondEvent.getSequenceNumber() - difference));
-		return result == 0.0 ? 1.0 : 0.0;
+		return (firstEvent.getSequenceNumber() - secondEvent.getSequenceNumber() == difference);
 	}
 
 	@Override

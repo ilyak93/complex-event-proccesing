@@ -25,26 +25,26 @@ public class BufferedEventsRatesCondition extends SingleEventCondition {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Double verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
+	protected Boolean verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
 		if (event.getType() != NFA.inputEventType)
-			return 0.0;
+			return false;
 		Object countersObject = event.getAttributeValue(NFA.inputBufferCountersAttributeName);
 		if (!(countersObject instanceof HashMap<?, ?>))
-			return 0.0;
+			return false;
 		if (order == null)
-			return 0.0;
+			return false;
 		HashMap<EventType, Integer> counters = (HashMap<EventType, Integer>)countersObject;
 		for (int i = 0; i < order.size(); ++i) {
 			Integer counter = counters.get(order.get(i));
 			if (counter == 0)
-				return 0.0;
+				return false;
 			if (i == 0)
 				continue;
 			Integer prevCounter = counters.get(order.get(i - 1));
 			if (prevCounter > counter)
-				return 0.0;
+				return false;
 		}
-		return 1.0;
+		return true;
 	}
 	
 	@Override

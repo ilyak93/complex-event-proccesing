@@ -14,18 +14,16 @@ public abstract class IteratedFilterCondition extends IteratedEventExternalCondi
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+	protected Boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
 														 Payload.ConditionsGraph graph) {
-		Double filterProb = 1.0;
 		for (Event event : internalEvents) {
-			Double currentFilterProb = filterEvent(event, externalEvent, graph);
-			if(currentFilterProb > 0.0){
-				filterProb*=currentFilterProb;
-			} else return 0.0;
+			if (!filterEvent(event, externalEvent, graph)) {
+				return false;
+			}
 		}
-		return filterProb;
+		return true;
 	}
 	
-	public abstract Double filterEvent(Event iteratedEvent, Event nonIteratedEvent, Payload.ConditionsGraph graph);
+	public abstract boolean filterEvent(Event iteratedEvent, Event nonIteratedEvent, Payload.ConditionsGraph graph);
 
 }

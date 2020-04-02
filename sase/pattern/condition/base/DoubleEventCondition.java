@@ -35,7 +35,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 	}
 	
 	@Override
-	protected Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
+	protected Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph) {
 		Event firstEvent = null;
 		Event secondEvent = null;
 		for (Event event : events) {
@@ -48,7 +48,7 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 				return verifyDoubleEvent(firstEvent, secondEvent, graph);
 			}
 		}
-		return 0.0;
+		return false;
 	}
 	
 	public EventType getLeftEventType() {
@@ -64,6 +64,6 @@ public abstract class DoubleEventCondition extends AtomicCondition {
 		return String.format("%s:%s", firstType.getName(), secondType.getName());
 	}
 	
-	protected abstract Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected abstract Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
 												Payload.ConditionsGraph graph);
 }

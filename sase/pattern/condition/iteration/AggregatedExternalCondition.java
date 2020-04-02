@@ -23,7 +23,7 @@ public class AggregatedExternalCondition extends IteratedEventExternalCondition 
 	}
 
 	@Override
-	protected Double verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
+	protected Boolean verifyListOfEventsWithExternalEvent(List<Event> internalEvents, Event externalEvent,
 														 Payload.ConditionsGraph graph) {
 		if (internalEvents.size() == 0) {
 			throw new RuntimeException("Empty list of events encountered");

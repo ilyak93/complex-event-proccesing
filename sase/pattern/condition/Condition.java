@@ -56,7 +56,7 @@ public abstract class Condition {
 	
 	//public abstract boolean verify(List<Event> events);
 
-	public abstract Double verify(List<Event> events, Payload.ConditionsGraph graph);
+	public abstract boolean verify(List<Event> events, Payload.ConditionsGraph graph);
 
 	protected abstract String getConditionKey();
 }

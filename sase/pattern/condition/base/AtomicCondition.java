@@ -31,7 +31,7 @@ public abstract class AtomicCondition extends Condition {
 		return super.getSelectivity();
 	}
 	
-	public Double verify(List<Event> events, Payload.ConditionsGraph graph) {
+	public boolean verify(List<Event> events, Payload.ConditionsGraph graph) {
 		if (shouldIgnoreSelectivityMeasurements()) {
 			return actuallyVerify(events, graph);
 		}
@@ -42,27 +42,27 @@ public abstract class AtomicCondition extends Condition {
 			firstEvent = getEventByType(events, firstEventType);
 			EventType secondEventType = ((DoubleEventCondition)this).getRightEventType();
 			secondEvent = getEventByType(events, secondEventType);
-			Double success_prob =
+			Boolean success =
 				Environment.getEnvironment().getPredicateResultsCache().getConditionEvaluationResult(this,
 																									 firstEvent,
 																									 secondEvent);
-			if (success_prob != null) {
-				return success_prob;
+			if (success != null) {
+				return success;
 			}
 		}
-		Double success_prob = actuallyVerify(events, graph);
+		Boolean success = actuallyVerify(events, graph);
 		if (MainConfig.conditionSelectivityMeasurementMode) {
-			ConditionSelectivityCollector.getInstance().recordConditionEvaluation(getConditionKey(), success_prob);
+			ConditionSelectivityCollector.getInstance().recordConditionEvaluation(getConditionKey(), success);
 		}
 		if (MainConfig.isSelectivityMonitoringAllowed) {
-			Environment.getEnvironment().getSelectivityEstimator().registerConditionVerification(this, success_prob);
+			Environment.getEnvironment().getSelectivityEstimator().registerConditionVerification(this, success);
 		}
 		if (this instanceof DoubleEventCondition) {
 			Environment.getEnvironment().getPredicateResultsCache()
 					.recordConditionEvaluation(this, firstEvent, secondEvent,
-							success_prob);
+							success);
 		}
-		return success_prob;
+		return success;
 	}
 	
 	private Event getEventByType(List<Event> events, EventType eventType) {
@@ -78,6 +78,6 @@ public abstract class AtomicCondition extends Condition {
 		return false;
 	}
 	
-	protected abstract Double actuallyVerify(List<Event> events, Payload.ConditionsGraph graph);
+	protected abstract Boolean actuallyVerify(List<Event> events, Payload.ConditionsGraph graph);
 	
 }
