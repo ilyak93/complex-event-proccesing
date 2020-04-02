@@ -3,9 +3,8 @@ package sase.base;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.util.function.Function;
 
-public abstract class Payload implements Function, Iterable {
+public abstract class Payload {
 
     protected Payload rightestOperand;
     protected Payload leftestOperand;
@@ -39,6 +38,25 @@ public abstract class Payload implements Function, Iterable {
         this.leftestOperand = p.leftestOperand;
         this.rightestOperand = p.rightestOperand;
     }
+    public static class PayloadValue{
+        Pair<Double, Double> NDvalue;
+
+        public PayloadValue(Pair<Double, Double> p) {
+            NDvalue = p;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(NDvalue);
+        }
+    }
 
     public static class ConditionsGraph {
         List<PayLoadUpdateGraph> graphs;
@@ -47,14 +65,19 @@ public abstract class Payload implements Function, Iterable {
             graphs = new LinkedList<>();
         }
 
+
         private ConditionsGraph(ConditionsGraph cg,
-                               Map<Pair<Object, Payload>, Pair<Object, Payload>> originCloneVertices){
+                               Map<Pair<PayloadValue, Payload>, Pair<PayloadValue, Payload>> originCloneVertices){
             List<PayLoadUpdateGraph> newGraphs = new LinkedList<>();
             for(PayLoadUpdateGraph graph : cg.graphs){
                 PayLoadUpdateGraph copy = graph.clone(originCloneVertices);
                 newGraphs.add(copy);
             }
             this.graphs = newGraphs;
+        }
+
+        public Boolean empty(){
+            return this.graphs.size() == 0;
         }
 
         public void addGraph(PayLoadUpdateGraph graph){
@@ -170,8 +193,8 @@ public abstract class Payload implements Function, Iterable {
                 for(String key : path.keySet()){
                     Double pathMult = 1.0;
                     for(PayLoadUpdateGraph.Vertex p : path.get(key)) {
-                        if(p.payloadOfValue.rightestOperand == null) continue; //TODO: it is a copy of a vertex because unary op
-                        pathMult *= ((Pair<Double, Double>)p.payloadValue).getValue();
+                        if(p.copy == true) continue; // it is a copy of a vertex because unary op
+                        pathMult *= p.payloadValue.NDvalue.getValue();
                     }
                     curMult *= pathMult;
                 }
@@ -181,6 +204,7 @@ public abstract class Payload implements Function, Iterable {
         }
 
         public Double computeProbability(){
+            if(this.graphs.isEmpty()) return 1.0;
             Double finalProb = 1.0;
             List<Map<String, Deque<PayLoadUpdateGraph.Vertex>>> allPaths = new LinkedList<>();
             Set<String> EventTypes = new HashSet<>();
@@ -195,7 +219,7 @@ public abstract class Payload implements Function, Iterable {
                 if(EventTypes.contains(graph.rightEventType)){
                     rightParticipatingInComputation = false;
                 }
-                List<Pair<Object, Payload>> roots = new LinkedList<>();
+                List<Pair<PayloadValue, Payload>> roots = new LinkedList<>();
                 List<Pair<Double, Double>> OperandValuesProbabilities = null;
                 Payload father = null;
                 OperandValuesProbabilities =
@@ -204,7 +228,7 @@ public abstract class Payload implements Function, Iterable {
                 father = graph.leftestOperand;
 
                 for(Pair<Double, Double> p : OperandValuesProbabilities){
-                    roots.add(new Pair(p, father));
+                    roots.add(new Pair(new Payload.PayloadValue(p), father));
                 }
 
                 Map<String, Map<Deque<PayLoadUpdateGraph.Vertex>,
@@ -222,7 +246,7 @@ public abstract class Payload implements Function, Iterable {
             return computeFinalProb(allPaths);
         }
 
-        public ConditionsGraph clone(Map<Pair<Object, Payload>, Pair<Object, Payload>> originCloneVertices){
+        public ConditionsGraph clone(Map<Pair<PayloadValue, Payload>, Pair<PayloadValue, Payload>> originCloneVertices){
             return new ConditionsGraph(this, originCloneVertices);
         }
 
@@ -236,26 +260,28 @@ public abstract class Payload implements Function, Iterable {
             this.edges.clear();
         }
 
+        static int id = 0;
+
         class Vertex {
-            Object payloadValue;
+            PayloadValue payloadValue;
             Payload payloadOfValue;
             Boolean visited;
             Boolean removed;
-            Vertex(Object payloadValue, Payload payloadOfValue) {
+            Boolean copy;
+            Vertex(PayloadValue payloadValue, Payload payloadOfValue) {
                 this.payloadValue = payloadValue;
                 this.payloadOfValue = payloadOfValue;
                 visited = false;
                 removed = false;
+                copy = false;
             }
             // equals and hashCode
             @Override
             public boolean equals(Object obj) {
-                return ((Pair<Double, Double>)payloadValue).getKey() ==
-                        ((Pair<Double, Double>)
-                                (((Vertex)obj).payloadValue)).getKey() &&
-                        ((Pair<Double, Double>)payloadValue).getValue() ==
-                                ((Pair<Double, Double>)
-                                        (((Vertex)obj).payloadValue)).getValue();
+                return payloadValue.NDvalue.getKey() ==
+                        ((((Vertex)obj).payloadValue)).NDvalue.getKey() &&
+                        (payloadValue.NDvalue.getValue() ==
+                                ((((Vertex)obj).payloadValue)).NDvalue.getValue());
             }
 
             @Override
@@ -290,9 +316,9 @@ public abstract class Payload implements Function, Iterable {
         private Map<Vertex, List<Vertex>> adjVertices;
         private Map<Pair<Vertex,Vertex>, Edge> edges;
         private Payload leftestOperand;
-        private Payload rightestOperand; // TODO: update everywhere needed
-        private String leftEventType; // TODO: update everywhere needed
-        private String rightEventType; // TODO: update everywhere needed
+        private Payload rightestOperand;
+        private String leftEventType;
+        private String rightEventType;
 
 
         public PayLoadUpdateGraph(){
@@ -303,6 +329,10 @@ public abstract class Payload implements Function, Iterable {
             this.rightestOperand = null;
             this.leftEventType = null;
             this.rightEventType = null;
+        }
+
+        public Boolean notEmpty(){
+            return !(this.vertices.isEmpty());
         }
 
         public void setLeftestEventType(String leftEventType) {
@@ -343,13 +373,14 @@ public abstract class Payload implements Function, Iterable {
             this.rightEventType = rightEventType;
         }
 
-        //TODO: buggy
-        void addVertex(Object payloadValue, Payload payloadOfValue) {
+
+        void addVertex(PayloadValue payloadValue, Payload payloadOfValue, Boolean copy) {
             Vertex toAdd = new Vertex(payloadValue, payloadOfValue);
             int idx = vertices.indexOf(toAdd);
             if(idx >= 0 && vertices.get(idx).hashCode() == payloadValue.hashCode()) {
                 toAdd = vertices.get(idx);
             }
+            toAdd.copy = copy;
             vertices.add(toAdd);
             Object result = adjVertices.putIfAbsent(toAdd, new ArrayList<>());
         }
@@ -380,8 +411,8 @@ public abstract class Payload implements Function, Iterable {
             return toReturn;
         }
 
-        void addEdge(Object payloadValue1, Payload payloadOfValue1,
-                     Object payloadValue2, Payload payloadOfValue2,
+        void addEdge(PayloadValue payloadValue1, Payload payloadOfValue1,
+                     PayloadValue payloadValue2, Payload payloadOfValue2,
                      String operation) {
             Vertex v1 = find(new Vertex(payloadValue1, payloadOfValue1));
             assert(v1 != null);
@@ -389,8 +420,7 @@ public abstract class Payload implements Function, Iterable {
             assert(v2 != null);
             List<Vertex> l = adjVertices.get(v1);
             l.add(v2);
-            //adjVertices.get(v2).add(v1);
-            edges.put(new Pair<>(v1, v2), new Edge(v1, v2, operation)); // TODO: remove all edges
+            edges.put(new Pair<>(v1, v2), new Edge(v1, v2, operation)); // TODO: optimization: mark and remove when not marked
         }
         /*
         void removeEdge(Object payloadValue1, Payload payloadOfValue1,
@@ -406,12 +436,8 @@ public abstract class Payload implements Function, Iterable {
             edges = null; //TODO: remove edge
         }
         */
-        List<Vertex> getAdjVertices(Object payloadValue, Payload payloadOfValue) {
+        List<Vertex> getAdjVertices(PayloadValue payloadValue, Payload payloadOfValue) {
             return adjVertices.get(new Vertex(payloadValue, payloadOfValue));
-        }
-
-        List<Vertex> getRoots(boolean left) {
-            return null; // TODO: update this
         }
 
         private boolean operatinIsMain(String operation){
@@ -493,14 +519,13 @@ public abstract class Payload implements Function, Iterable {
             switch(operation){
                 case "substract":
 
-                    Double value1 = ((Pair<Double, Double>)v1.payloadValue).getKey();
-                    Double value2 = ((Pair<Double, Double>)v2.payloadValue).getKey();
+                    Double value1 = v1.payloadValue.NDvalue.getKey();
+                    Double value2 = (v2.payloadValue).NDvalue.getKey();
                     Double result = value1 - value2;
-                    //Double result = Double.valueOf(df.format(value1 - value2));
                     result = (double)Math.round(result * 10000000000l) / 10000000000l;
                     return new Pair(result,
-                            ((Pair<Double, Double>)v1.payloadValue).getValue() *
-                                    ((Pair<Double, Double>)v2.payloadValue).getValue());
+                            (v1.payloadValue).NDvalue.getValue() *
+                                    (v2.payloadValue).NDvalue.getValue());
                 default:
                     return null;
             }
@@ -528,13 +553,15 @@ public abstract class Payload implements Function, Iterable {
             }
         }
 
-        Double depthFirstTraversal(List<Pair<Object, Payload>> roots) {
-            Set<Pair<Object, Payload>> visited = new LinkedHashSet<Pair<Object, Payload>>();
+        Double depthFirstTraversal(List<Pair<PayloadValue, Payload>> roots) {
+            Set<Pair<PayloadValue, Payload>> visited = new LinkedHashSet<Pair<PayloadValue, Payload>>();
             Stack<Vertex> stackOfVisited = new Stack<>();
             Double result = new Double(0.0);
-            for(Pair<Object, Payload> root : roots) {
+            for(Pair<PayloadValue, Payload> root : roots) {
                 Pair<Double,Double> firstValue = new Pair(0.0, 1.0);
                 Pair<Double,Double> secondValue = new Pair(0.0, 1.0);
+                PayloadValue pv = root.getKey();
+                Payload p = root.getValue();
                 Vertex rt = new Vertex(root.getKey(), root.getValue());
                 for( Vertex v : this.adjVertices.keySet()){
                     if(v!= null && v.equals(rt)){
@@ -618,7 +645,7 @@ public abstract class Payload implements Function, Iterable {
             return fResult;
         }
 
-        public PayLoadUpdateGraph clone(Map<Pair<Object, Payload>, Pair<Object, Payload>> originCloneVertices) {
+        public PayLoadUpdateGraph clone(Map<Pair<PayloadValue, Payload>, Pair<PayloadValue, Payload>> originCloneVertices) {
             Vector<Vertex> newVertices = new Vector<>();
             Map<Vertex, Vertex> newVerticesAux = new HashMap<>();
             Map<Vertex, List<Vertex>> newAdjVertices = new HashMap<>();
@@ -628,9 +655,8 @@ public abstract class Payload implements Function, Iterable {
 
             for(Vertex v: this.vertices){
                 if(v.removed == true) continue;
-                Pair<Object, Payload> newVertexData = originCloneVertices.get(new Pair(v.payloadValue, v.payloadOfValue));
+                Pair<PayloadValue, Payload> newVertexData = originCloneVertices.get(new Pair(v.payloadValue, v.payloadOfValue));
                 if(newVertexData == null ){ //that means its a replica (of unary operator for exmaple) an not real payload pair, then create it now
-                    //TODO: check if in copies
                     Payload p = copies.get(v.payloadOfValue);
                     DiscreteDistributionPayload payloadOfValue = null;
                     if(p != null){
@@ -640,14 +666,15 @@ public abstract class Payload implements Function, Iterable {
                                 new DiscreteDistributionPayload(new LinkedList<>());
                     }
                     Pair<Double, Double> newPair = new Pair<>(
-                            ((Pair<Double, Double>)v.payloadValue).getKey(),
-                            ((Pair<Double, Double>)v.payloadValue).getValue());
+                            (v.payloadValue).NDvalue.getKey(),
+                            (v.payloadValue).NDvalue.getValue());
                     payloadOfValue.addValue(newPair);
                     copies.put(v.payloadOfValue, payloadOfValue);
-                    newVertexData = new Pair(newPair, payloadOfValue);
+                    newVertexData = new Pair(new PayloadValue(newPair), payloadOfValue);
 
                 }
                 Vertex newVertex = new Vertex(newVertexData.getKey(), newVertexData.getValue());
+                newVertex.copy = v.copy;
                 newVertices.add(newVertex);
                 newVerticesAux.put(v, newVertex);
             }
@@ -671,7 +698,7 @@ public abstract class Payload implements Function, Iterable {
         }
 
         Map<String, Map<Deque<Vertex>, List<Deque<Vertex>>>>
-        depthFirstTraversalCompute(List<Pair<Object, Payload>> roots,
+        depthFirstTraversalCompute(List<Pair<PayloadValue, Payload>> roots,
                                    String leftEventType,
                                    String rightEventType) {
             Deque<Vertex> stackOfVisited = new LinkedList<>();
@@ -686,7 +713,7 @@ public abstract class Payload implements Function, Iterable {
                     List<Deque<Vertex>>> newMap2 = new HashMap<>();
             newPaths.put(leftEventType, newMap1);
             newPaths.put(rightEventType, newMap2);
-            for(Pair<Object, Payload> root : roots) {
+            for(Pair<PayloadValue, Payload> root : roots) {
                 Pair<Double,Double> firstValue = new Pair(0.0, 1.0);
                 Pair<Double,Double> secondValue = new Pair(0.0, 1.0);
                 Vertex rt = new Vertex(root.getKey(), root.getValue());
@@ -715,7 +742,6 @@ public abstract class Payload implements Function, Iterable {
                 }
             }
             return newPaths;
-            //return result;
         }
 
         private void depthFirstTraversalComputeAux(

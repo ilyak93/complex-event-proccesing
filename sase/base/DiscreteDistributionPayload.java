@@ -1,15 +1,12 @@
 package sase.base;
 import javafx.util.Pair;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DiscreteDistributionPayload extends Payload {
-    //TODO: implement data_structure
     List<Pair<Double,Double>> valuesProbabilities;
 
-    //TODO: implemet ctors and geters
     public DiscreteDistributionPayload(String raw){
         String[] valuesProbablities = (raw).split(" ");
         assert valuesProbablities.length != 0;
@@ -54,22 +51,6 @@ public class DiscreteDistributionPayload extends Payload {
         valuesProbabilities = DDP.valuesProbabilities.;
     }
     */
-    //TODO: implemet overriden methods
-    @Override
-    public Iterator iterator() {
-        return null;
-    }
-
-    @Override
-    public Object apply(Object o) {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return "";
-    }
-
 
     public  List<Pair<Double, Double>> getValue() {
         return new LinkedList<>(valuesProbabilities);
@@ -91,9 +72,9 @@ public class DiscreteDistributionPayload extends Payload {
 
     @Override
     public Boolean contains(Object o) {
-        Pair<Double, Double> toFind = (Pair<Double, Double>) o;
+        Payload.PayloadValue toFind = (Payload.PayloadValue) o;
         for(Pair<Double, Double> p : this.valuesProbabilities){
-            if(p.getKey() == toFind.getKey() && p.getValue() == toFind.getValue()) return true;
+            if(p.getKey() == toFind.NDvalue.getKey() && p.getValue() == toFind.NDvalue.getValue()) return true;
         }
         return false;
     }

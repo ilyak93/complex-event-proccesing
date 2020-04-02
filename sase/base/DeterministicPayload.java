@@ -1,8 +1,5 @@
 package sase.base;
 
-import java.util.Collections;
-import java.util.Iterator;
-
 public class DeterministicPayload extends Payload {
     private Double value;
 
@@ -24,21 +21,6 @@ public class DeterministicPayload extends Payload {
         return 1.0;
     }
 
-    @Override
-    public Iterator iterator() {
-        return Collections.singleton(value).iterator();
-    }
-
-    @Override
-    public boolean equals(Object o){
-        return this.value == ((DeterministicPayload)o).value;
-    }
-
-    @Override
-    public Object apply(Object o) {
-        if(o.equals(this)) return 1.0;
-        return 0.0;
-    }
 
     @Override
     public String toString() {

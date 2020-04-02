@@ -21,11 +21,10 @@ public class SlidingWindowSelectivityEstimator {
 		this.maxError = maxError;
 	}
 	
-	public void registerConditionVerification(AtomicCondition condition, Double result_prob) {
+	public void registerConditionVerification(AtomicCondition condition, Boolean result) {
 		if (!estimators.containsKey(condition)) {
 			estimators.put(condition, new ExponentialHistogramsCounter(calculateWindowSizeForCondition(condition), maxError));
 		}
-		boolean result = result_prob > 0;
 		estimators.get(condition).addElement(result);
 	}
 	

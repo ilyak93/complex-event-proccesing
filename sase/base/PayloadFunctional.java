@@ -88,7 +88,8 @@ public abstract class PayloadFunctional {
     }
 
     private static DeterministicPayload subtractDD(DeterministicPayload a, DeterministicPayload b) {
-        return new DeterministicPayload(a.getValue() - b.getValue());
+        double res = (double)Math.round((a.getValue() - b.getValue()) * 10000000000l) / 10000000000l;
+        return new DeterministicPayload(res);
     }
 
     private static DiscreteDistributionPayload subtractDDD(DeterministicPayload a, DiscreteDistributionPayload b) {
@@ -110,17 +111,17 @@ public abstract class PayloadFunctional {
         List<Pair<Double, Double>> valuesProbabilities2 = b.getValue();
         List result = new LinkedList();
         for (Pair<Double, Double> p1 : valuesProbabilities1) {
-            graph.addVertex(p1, a);
+            graph.addVertex(new Payload.PayloadValue(p1), a, false);
         }
         for (Pair<Double, Double> p2 : valuesProbabilities2) {
-            graph.addVertex(p2, b);
+            graph.addVertex(new Payload.PayloadValue(p2), b, false);
         }
         for (Pair<Double, Double> p1 : valuesProbabilities1) {
             for (Pair<Double, Double> p2 : valuesProbabilities2) {
                 Double newValue = p1.getKey() - p2.getKey();
                 Double valueProb = p1.getValue() * p2.getValue();
                 result.add(new Pair<>(newValue, valueProb));
-                graph.addEdge(p1, a, p2, b, "substract");
+                graph.addEdge(new Payload.PayloadValue(p1), a, new Payload.PayloadValue(p2), b, "substract");
             }
         }
         return new DiscreteDistributionPayload(result);
@@ -146,8 +147,8 @@ public abstract class PayloadFunctional {
         res.setLeftestOperand(a.getLeftestOperand());
         for (Pair<Double, Double> p1 : ((DiscreteDistributionPayload)a.getRightestOperand()).valuesProbabilities) {
             Pair<Double, Double> newP = new Pair(p1.getKey(), p1.getValue());
-            graph.addVertex(newP, righestCopy);
-            graph.addEdge(p1, a.rightestOperand, newP, righestCopy, "abs");
+            graph.addVertex(new Payload.PayloadValue(newP), righestCopy, true);
+            graph.addEdge(new Payload.PayloadValue(p1), a.rightestOperand, new Payload.PayloadValue(newP), righestCopy, "abs");
         }
         return res;
     }
@@ -216,7 +217,7 @@ public abstract class PayloadFunctional {
                         getValue();
         for(Pair<Double, Double> p1 : rightestOperandValuesProbabilities){
             for(Pair<Double, Double> p2 : leftestOperandValuesProbabilities){
-                graph.addEdge(p1, a.rightestOperand, p2, b.leftestOperand, "lessThen");
+                graph.addEdge(new Payload.PayloadValue(p1), a.rightestOperand, new Payload.PayloadValue(p2), b.leftestOperand, "lessThen");
             }
         }
         Double res = updateLists(a, b, graph);
@@ -269,9 +270,9 @@ public abstract class PayloadFunctional {
         List<Pair<Double, Double>> leftestOperandValuesProbabilities =
                 ((DiscreteDistributionPayload)a.getLeftestOperand()).
                         getValue();
-        List<Pair<Object, Payload>> roots = new LinkedList<>();
+        List<Pair<Payload.PayloadValue, Payload>> roots = new LinkedList<>();
         for(Pair<Double, Double> p : leftestOperandValuesProbabilities){
-            roots.add(new Pair(p, a.leftestOperand));
+            roots.add(new Pair(new Payload.PayloadValue(p), a.leftestOperand));
         }
         return graph.depthFirstTraversal(roots);
     }
