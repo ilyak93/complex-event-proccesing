@@ -100,17 +100,15 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 
 	private List<Instance> processNewEventOnInstance(Event event, Instance instance) {
 		List<Instance> newInstances = new ArrayList<Instance>();
+		if(event.getProb() == 0) return newInstances;
 		for (Transition transition : instance.getCurrentState().getOutgoingTransitions()) {
 			Instance instanceCopy = instance.cloneWithEvents();
 			Event copy = event.clone();
-			Double transitionProb = instanceCopy.isTransitionPossible(copy, transition);
-			if (transitionProb <= 0.0)
+			if (!instanceCopy.isTransitionPossible(copy, transition))
 				continue;
 			instance = instanceCopy.cloneWithEvents();
 			Instance newInstance = instanceCopy.clone();
-			//newInstance.updateProb(transitionProb);
 			newInstances.add(newInstance);
-			//newInstances.add(oldInstance);
 			newInstance.executeTransition(copy, transition);
 			newInstances.addAll(executeEmptyTransitions(newInstance));
 		}
@@ -222,6 +220,7 @@ public abstract class NFA implements IEvaluationMechanism, IEvaluationMechanismI
 		// the evaluation was completed - the instance should be removed
 		// regardless of success
 		Double matchProb = instance.getMatchProb();
+		matchProb = (double)Math.round(matchProb * 10000000000l) / 10000000000l;
 		if(matchProb <= 0.0) return false;
 		if (actualMatch != null && instance.shouldReportMatch()) {
 			// an actual match was detected

@@ -99,9 +99,9 @@ public class Instance {
 		return isExpired(0);
 	}
 
-	public Double isTransitionPossible(Event event, Transition transition) {
+	public Boolean isTransitionPossible(Event event, Transition transition) {
 		if (event.getType() != transition.getEventType())
-			return -1.0;
+			return false;
 		EventBuffer bufferOfEventsToVerify = matchBuffer.clone();
 		bufferOfEventsToVerify.addEvent(event);
 		return transition.verifyCondition(bufferOfEventsToVerify.getEvents(),

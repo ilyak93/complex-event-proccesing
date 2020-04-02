@@ -103,36 +103,36 @@ public class LazyInstance extends Instance {
 		}
 	}
 	
-	private Double isRegularTransitionPossible(Event event, LazyTransition transition,
+	private Boolean isRegularTransitionPossible(Event event, LazyTransition transition,
 											   Payload.ConditionsGraph graph) {
 		if (MainConfig.selectionStrategy == EventSelectionStrategies.CONTUGUITY) {
 			LazyNFA lazyNfa = (LazyNFA)automaton;
 			Event precedingEvent = transition.getActualPrecedingEvent(getEventsFromMatchBuffer());
-			if (precedingEvent != null && lazyNfa.verifyContiguityConditions(event, precedingEvent,
-					graph) <= 0.0) {
-				return 0.0;
+			if (precedingEvent != null && !lazyNfa.verifyContiguityConditions(event, precedingEvent,
+					graph)) {
+				return false;
 			}
 			Event succeedingEvent = transition.getActualSucceedingEvent(getEventsFromMatchBuffer());
-			if (succeedingEvent != null && lazyNfa.verifyContiguityConditions(event, succeedingEvent,
-					graph) <= 0.0) {
-				return 0.0;
+			if (succeedingEvent != null && !lazyNfa.verifyContiguityConditions(event, succeedingEvent,
+					graph)) {
+				return false;
 			}
 		}
 		return super.isTransitionPossible(event, transition);
 	}
 	
 	@Override
-	public Double isTransitionPossible(Event event, Transition transition) {
+	public Boolean isTransitionPossible(Event event, Transition transition) {
 		LazyTransition lazyTransition = (LazyTransition)transition;
 		switch(lazyTransition.getType()) {
 			case REGULAR:
 				return isRegularTransitionPossible(event, lazyTransition,getGraphFromMatchBuffer());
 			case SEARCH_FAILED:
-				return 1.0; //we assume this type of edge to only be traversed when all conditions hold
+				return true; //we assume this type of edge to only be traversed when all conditions hold
 			case TIMEOUT:
-				return isExpired() ? 0.0 : 1.0;
+				return isExpired();
 			default:
-				return 0.0;
+				return false;
 		}
 	}
 	

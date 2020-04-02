@@ -268,7 +268,7 @@ public class AND_SEQ_NFA extends AND_NFA {
 		conditionToVerify.addAtomicConditions(negativeTemporalConditions.get(negativeEventType));
 		for (Event negativeEvent : negatedEventsBuffer.getTypeBuffer(negativeEventType)) {
 			positiveEvents.add(0, negativeEvent);
-			if (conditionToVerify.verify(positiveEvents, graph) <= 0.0) {
+			if (!conditionToVerify.verify(positiveEvents, graph)) {
 				//negative event found - we should invalidate this match
 				return false;
 			}

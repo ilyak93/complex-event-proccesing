@@ -48,9 +48,9 @@ public abstract class LazyNFA extends NFA {
 		return rejectingState;
 	}
 	
-	public Double verifyContiguityConditions(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
+	public Boolean verifyContiguityConditions(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		if (contiguityVerifier == null) {
-			return 1.0;
+			return true;
 		}
 		return contiguityVerifier.verify(Arrays.asList(new Event[] {firstEvent, secondEvent}), graph);
 	}
@@ -255,18 +255,15 @@ public abstract class LazyNFA extends NFA {
 	private List<LazyInstance> attemptTransitionOnInstance(Event event, LazyInstance instance,
 			LazyTransition transition) {
 		List<LazyInstance> newInstances = new ArrayList<LazyInstance>();
-		Double transition_prob = instance.isTransitionPossible(event, transition);
-		if (transition_prob <= 0.0)
+		if (!instance.isTransitionPossible(event, transition))
 			return newInstances;
 
 		boolean shouldCloneInstance = transition.shouldCloneInstance();
 		LazyInstance immediateTransitionInstance;
 		if (shouldCloneInstance) {
 			immediateTransitionInstance = instance.clone();
-			immediateTransitionInstance.updateProb(transition_prob);
 		} else {
 			immediateTransitionInstance = instance;
-			immediateTransitionInstance.updateProb(transition_prob);
 		}
 		immediateTransitionInstance.executeTransition(event, transition);
 		boolean hasFinishedWithMatch = immediateTransitionInstance.getCurrentState().isAccepting();

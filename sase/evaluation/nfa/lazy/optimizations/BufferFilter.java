@@ -27,17 +27,15 @@ public class BufferFilter extends BufferPreprocessor {
 			}
 		}
 		
-		public Double applyFilter(Event eventToFilter, Payload.ConditionsGraph graph) { //TODO: make sue with Ilya what is that
-			Double filterConditionProb = 1.0;
+		public Boolean applyFilter(Event eventToFilter, Payload.ConditionsGraph graph) { //TODO: make sue with Ilya what is that
 			for (AtomicCondition atomicCondition : filterCondition.getAtomicConditions()) {
 				IteratedFilterCondition atomicFilterCondition = (IteratedFilterCondition)atomicCondition;
 				Event externalEventToVerifyWith = conditionToExternalEvent.get(atomicFilterCondition);
-				Double currentFilterConditionProb = atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith, graph);
-				if (currentFilterConditionProb > 0.0) {
-					filterConditionProb *= currentFilterConditionProb;
-				} else return 0.0;
+				if (!atomicFilterCondition.filterEvent(eventToFilter, externalEventToVerifyWith, graph)) {
+					return false;
+				}
 			}
-			return filterConditionProb;
+			return true;
 		}
 	};
 

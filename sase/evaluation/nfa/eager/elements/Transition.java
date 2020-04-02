@@ -67,7 +67,7 @@ public class Transition {
 		return condition.verify(events);
 	}
 	*/
-	public Double verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
+	public Boolean verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
 		return condition.verify(events, graph);
 	}
 	

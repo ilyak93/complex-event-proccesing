@@ -98,13 +98,8 @@ public class LazyTransition extends Transition {
 	}
 
 	@Override
-	public Double verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
-		Double condProb = super.verifyCondition(events, graph);
-		Double temporalCondProb = 1.0;
-		if(temporalCondition != null){
-			temporalCondProb = temporalCondition.verify(events,graph);
-		}
-		return condProb*temporalCondProb;
+	public Boolean verifyCondition(List<Event> events, Payload.ConditionsGraph graph) {
+		return super.verifyCondition(events, graph) && (temporalCondition == null || temporalCondition.verify(events, graph));
 	}
 	
 	@Override
