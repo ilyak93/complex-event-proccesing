@@ -65,7 +65,7 @@ public abstract class EventProducer {
 		if (eventType == null) {
 			return false;
 		}
-		double prob = -1;
+		double prob = 1.0;
 		for(String param : rawEvent){
 			if(param.split(":")[0].equals("Prob")){
 				prob = Double.valueOf(param.split(":")[1]);
