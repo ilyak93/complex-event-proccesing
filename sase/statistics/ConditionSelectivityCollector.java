@@ -38,13 +38,13 @@ public class ConditionSelectivityCollector {
 		}
 	}
 	
-	public void recordConditionEvaluation(String key, Double success_prob) {
+	public void recordConditionEvaluation(String key, Boolean success) {
 		SelectivityCounters countersForKey = counters.get(key);
 		if (countersForKey == null) {
 			countersForKey = new SelectivityCounters();
 		}
 		++countersForKey.in;
-		if (success_prob > 0) {
+		if (success) {
 			++countersForKey.out;
 		}
 		counters.put(key, countersForKey);
