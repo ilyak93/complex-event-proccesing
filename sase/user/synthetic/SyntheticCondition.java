@@ -6,6 +6,8 @@ import sase.base.Payload;
 import sase.input.producers.ISyntheticSelectivityProvider;
 import sase.pattern.condition.base.DoubleEventCondition;
 
+import java.util.Random;
+
 public class SyntheticCondition extends DoubleEventCondition {
 
 	private static int currentID = 0;
@@ -23,7 +25,7 @@ public class SyntheticCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
                                        Payload.ConditionsGraph graph) {
 		if (selectivityProvider == null) {
 			throw new RuntimeException("The selectivity provider was not set yet.");
@@ -35,11 +37,8 @@ public class SyntheticCondition extends DoubleEventCondition {
 			}
 		}
 		double currentSelectivity = selectivityProvider.getSelectivity(id, firstEvent, secondEvent);
-		//return (new Random().nextDouble() < currentSelectivity);
-		//TODO: use our types and functions
-		return 1.0;
+		return (new Random().nextDouble() < currentSelectivity);
 	}
-
 	@Override
 	protected String getConditionKey() {
 		return "Unsupported";

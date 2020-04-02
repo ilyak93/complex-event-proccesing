@@ -14,12 +14,12 @@ public class TrafficSpeedToVehiclesNumberCorrelationCondition extends DoubleEven
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
                                        Payload.ConditionsGraph graph) {
 		Integer firstPointID = (Integer) firstEvent.getAttributeValue(AarhusTrafficEventTypesManager.pointIDAttributeName);
 		Integer secondPointID = (Integer) secondEvent.getAttributeValue(AarhusTrafficEventTypesManager.pointIDAttributeName);
 		if (firstPointID == secondPointID) {
-			return 0.0;
+			return false;
 		}
 		Integer firstSpeed = 
 				(Integer) firstEvent.getAttributeValue(AarhusTrafficEventTypesManager.averageSpeedAttributeName);
@@ -32,9 +32,8 @@ public class TrafficSpeedToVehiclesNumberCorrelationCondition extends DoubleEven
 		boolean requestSpeedIncrease = 
 				(firstNumberOfVehicles == secondNumberOfVehicles) ? (firstPointID < secondPointID) :
 																	(firstNumberOfVehicles > secondNumberOfVehicles);
-		//return requestSpeedIncrease ? (firstSpeed + minSpeedDiff < secondSpeed) : (secondSpeed + minSpeedDiff < firstSpeed);
-		//TODO:: use our functions and types
-		return 1.0;
+		return requestSpeedIncrease ? (firstSpeed + minSpeedDiff < secondSpeed) : (secondSpeed + minSpeedDiff < firstSpeed);
+
 	}
 
 	@Override

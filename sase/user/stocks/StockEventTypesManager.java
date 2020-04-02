@@ -485,14 +485,28 @@ public class StockEventTypesManager extends EventTypesManager {
 	public Long getEventTimestamp(Event event) {
 		return (Long)event.getAttributeValue(timestampAttributeIndex);
 	}
+
+	private Boolean isDouble(String s){
+		try {
+			Double.parseDouble(s);
+			return true;
+		} catch( Exception e) {
+			return false;
+		}
+	}
 	
 	@Override
 	public Object[] convertStringPayloadToObjectPayload(Object[] payload) {
-		Object[] newPayload = new Object[payload.length-1]; //TODO: -1 because one parameter is the probability Ilya
+		Object[] newPayload = null;
+		if(String.valueOf(payload[payload.length-1]).split(":")[0].equals("Prob")) {
+			newPayload = new Object[payload.length - 1]; //TODO: -1 because one parameter is the probability Ilya
+		} else {
+			newPayload = new Object[payload.length];
+		}
 		newPayload[labelAttributeIndex] = payload[labelAttributeIndex];
 		newPayload[timestampAttributeIndex] = Long.valueOf((String)payload[timestampAttributeIndex]);
 		for (int i = firstStockMeasurementIndex; i < payload.length; ++i) {
-			if (payload[i] instanceof Double) {
+			if (isDouble((String)payload[i])) {
 				newPayload[i] = new DeterministicPayload((String)(payload[i]));
 			} else if(((String)payload[i]).charAt(0) == '['){
 				newPayload[i] = new DiscreteDistributionPayload((String)(payload[i]));

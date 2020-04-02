@@ -29,7 +29,7 @@ public class StockDeltaOrderingCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent, Payload.ConditionsGraph graph) {
 		//this.graph.clear();
 		Payload.PayLoadUpdateGraph newGraph = new Payload.PayLoadUpdateGraph();
 		newGraph.setLeftestEventType(firstEvent.getType().getName());
@@ -39,8 +39,10 @@ public class StockDeltaOrderingCondition extends DoubleEventCondition {
 		Payload b = calculateDelta(secondEvent, newGraph);
 		newGraph.setRightestOperand(b.getLeftestOperand());
 		Double result = PayloadFunctional.lessThen(a, b, newGraph); //TODO: use our function and type
-		graph.addGraph(newGraph);
-		return result;
+		if(newGraph.notEmpty()) {
+			graph.addGraph(newGraph);
+		}
+		return result > 0;
 	}
 	
 	@Override

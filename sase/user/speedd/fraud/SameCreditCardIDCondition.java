@@ -16,11 +16,11 @@ public class SameCreditCardIDCondition extends DoubleEventCondition {
 	}
 
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
                                        Payload.ConditionsGraph graph) {
 		String firstID = (String) firstEvent.getAttributeValue(CreditCardFraudEventTypesManager.creditCardIDAttributeIndex);
 		String secondID = (String) secondEvent.getAttributeValue(CreditCardFraudEventTypesManager.creditCardIDAttributeIndex);
-		return (firstID.equals(secondID)) ? 1.0 : 0.0;
+		return (firstID.equals(secondID));
 	}
 
 	@Override

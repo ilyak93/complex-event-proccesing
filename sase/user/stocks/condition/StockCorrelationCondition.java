@@ -40,18 +40,18 @@ public class StockCorrelationCondition extends DoubleEventCondition {
 	}
 	
 	@Override
-	protected Double verifyDoubleEvent(Event firstEvent, Event secondEvent,
+	protected Boolean verifyDoubleEvent(Event firstEvent, Event secondEvent,
                                        Payload.ConditionsGraph graph) {
 		if (getCompanyName(firstEvent) == getCompanyName(secondEvent))
-			return 0.0;
+			return false;
 		
 		double[] firstEventHistory = getStockHistory(firstEvent);
 		double[] secondEventHistory = getStockHistory(secondEvent);
 		double correlation = new PearsonsCorrelation().correlation(firstEventHistory,
 															   	   secondEventHistory);
 		Environment.getEnvironment().getStatisticsManager().incrementDiscreteStatistic(Statistics.correlationComputations);
-		//return minCorrelation > 0 ? correlation > minCorrelation : correlation < minCorrelation;
-		return 1.0; //TODO: use our functions and type
+		return minCorrelation > 0 ? correlation > minCorrelation : correlation < minCorrelation;
+
 	}
 	
 	@Override

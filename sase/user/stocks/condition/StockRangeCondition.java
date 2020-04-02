@@ -25,10 +25,8 @@ public class StockRangeCondition extends SingleEventCondition {
 	}
 	
 	@Override
-	protected Double verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
-		//return (getStockPricesRange(event) >= minRange);
-		//TODO: use our function and type
-		return 1.0;
+	protected Boolean verifySingleEvent(Event event, Payload.ConditionsGraph graph) {
+		return (getStockPricesRange(event) >= minRange);
 	}
 	
 	@Override
