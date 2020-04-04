@@ -143,12 +143,27 @@ public abstract class Payload {
                 common = rightEventTypeName;
                 newEventTypeName = leftEventTypeName;
             }
+            Set<Deque<PayLoadUpdateGraph.Vertex>> updateKeys = newPaths.get(common).keySet();
+            Map<PayLoadUpdateGraph.Vertex, Boolean> update = new HashMap<>();
+            for(Deque<PayLoadUpdateGraph.Vertex> key : updateKeys){
+                for(Deque<PayLoadUpdateGraph.Vertex> path : newPaths.get(common).get(key)) {
+                    for(PayLoadUpdateGraph.Vertex v : path) {
+                        update.put(v, true);
+                    }
+                }
+            }
+
             for(Map<String, Deque<PayLoadUpdateGraph.Vertex>> paths1 : allPaths1){
                 Map<Deque<PayLoadUpdateGraph.Vertex>,
                         List<Deque<PayLoadUpdateGraph.Vertex>>> pathsOfCommon = newPaths.get(common);
+                boolean toRemove = true;
                 for(Deque<PayLoadUpdateGraph.Vertex> path : pathsOfCommon.keySet()) {
                     if (path.equals(paths1.get(common))) {
+                        toRemove = false;
                         for(Deque<PayLoadUpdateGraph.Vertex> newPath :  pathsOfCommon.get(path)) {
+                            for(PayLoadUpdateGraph.Vertex v : newPath) {
+                                update.put(v, false);
+                            }
                             Map<String, Deque<PayLoadUpdateGraph.Vertex>> newMap = new HashMap<>();
                             for (String oldEventType : paths1.keySet()) {
                                 newMap.put(oldEventType, paths1.get(oldEventType));
@@ -157,6 +172,19 @@ public abstract class Payload {
                             newList.add(newMap);
                         }
                     }
+                }
+                if(toRemove == true){
+                    for(String key : paths1.keySet()){
+                        for(PayLoadUpdateGraph.Vertex v: paths1.get(key)){
+                            v.payloadOfValue.updatePayload(v.payloadValue);
+                        }
+                    }
+                }
+            }
+
+            for(PayLoadUpdateGraph.Vertex v : update.keySet()){
+                if(update.get(v) == true){
+                    v.payloadOfValue.updatePayload(v.payloadValue);
                 }
             }
             return newList;
