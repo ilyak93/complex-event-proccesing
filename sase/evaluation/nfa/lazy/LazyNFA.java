@@ -232,6 +232,10 @@ public abstract class LazyNFA extends NFA {
 		if (match == null) {
 			return false;
 		}
+		Double matchProb = instance.getMatchProb();
+		matchProb = (double)Math.round(matchProb * 10000000000l) / 10000000000l;
+		if(matchProb <= 0.0) return false;
+		match.updateMatchConditionsProb(matchProb);
 		if (lazyInstance.shouldReportMatch()) {
 			listOfMatches.add(match);
 		}
@@ -255,17 +259,23 @@ public abstract class LazyNFA extends NFA {
 	private List<LazyInstance> attemptTransitionOnInstance(Event event, LazyInstance instance,
 			LazyTransition transition) {
 		List<LazyInstance> newInstances = new ArrayList<LazyInstance>();
-		if (!instance.isTransitionPossible(event, transition))
+		LazyInstance instanceCopy = instance.cloneWithEvents();
+		Event copy = null;
+		if(event != null){
+			if(event.getProb() == 0) return newInstances;
+			copy = event.clone();
+		}
+		if (!instanceCopy.isTransitionPossible(copy, transition))
 			return newInstances;
 
 		boolean shouldCloneInstance = transition.shouldCloneInstance();
 		LazyInstance immediateTransitionInstance;
 		if (shouldCloneInstance) {
-			immediateTransitionInstance = instance.clone();
+			immediateTransitionInstance = instanceCopy.clone();
 		} else {
-			immediateTransitionInstance = instance;
+			immediateTransitionInstance = instanceCopy;
 		}
-		immediateTransitionInstance.executeTransition(event, transition);
+		immediateTransitionInstance.executeTransition(copy, transition);
 		boolean hasFinishedWithMatch = immediateTransitionInstance.getCurrentState().isAccepting();
 		boolean hasFinished = hasFinishedWithMatch || immediateTransitionInstance.getCurrentState().isRejecting();
 

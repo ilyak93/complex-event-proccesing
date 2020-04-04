@@ -53,6 +53,8 @@ public class LazyInstance extends Instance {
 		}
 		return false;
 	}
+
+
 	
 	private void executeRegularTransition(Event event, Transition transition) {
 		if (event == null || event.getType().getName().equals(NFA.inputBufferEventTypeName))
@@ -139,5 +141,9 @@ public class LazyInstance extends Instance {
 	@Override
 	public LazyInstance clone() {
 		return new LazyInstance((LazyNFA)automaton, currentState, matchBuffer, matchProbability);
+	}
+
+	public LazyInstance cloneWithEvents() {
+		return new LazyInstance((LazyNFA)automaton, currentState, matchBuffer.cloneWithEvents(), matchProbability);
 	}
 }

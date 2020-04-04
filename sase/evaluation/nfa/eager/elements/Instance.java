@@ -69,6 +69,7 @@ public class Instance {
 	public Match getMatch() {
 		if (!currentState.isAccepting())
 			return null;
+
 		return new Match(getEventsFromMatchBuffer(), matchBuffer.getLatestTimestamp());
 	}
 	
