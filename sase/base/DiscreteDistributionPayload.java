@@ -67,7 +67,7 @@ public class DiscreteDistributionPayload extends Payload {
 
     @Override
     public void updatePayload(Object payloadValue) {
-        valuesProbabilities.removeIf(p -> p == payloadValue);
+        valuesProbabilities.removeIf(p -> p == ((PayloadValue)payloadValue).getValue());
     }
 
     @Override
