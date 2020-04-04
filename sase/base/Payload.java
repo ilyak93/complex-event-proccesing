@@ -39,10 +39,14 @@ public abstract class Payload {
         this.rightestOperand = p.rightestOperand;
     }
     public static class PayloadValue{
-        Pair<Double, Double> NDvalue;
+        private Pair<Double, Double> NDvalue;
 
         public PayloadValue(Pair<Double, Double> p) {
             NDvalue = p;
+        }
+
+        Pair<Double, Double> getValue(){
+            return this.NDvalue;
         }
 
         @Override
@@ -193,7 +197,7 @@ public abstract class Payload {
                 for(String key : path.keySet()){
                     Double pathMult = 1.0;
                     for(PayLoadUpdateGraph.Vertex p : path.get(key)) {
-                        if(p.copy == true) continue; // it is a copy of a vertex because unary op
+                        if(p.copy == true || p.repeated == true) continue; // it is a copy of a vertex because unary op
                         pathMult *= p.payloadValue.NDvalue.getValue();
                     }
                     curMult *= pathMult;
@@ -268,12 +272,14 @@ public abstract class Payload {
             Boolean visited;
             Boolean removed;
             Boolean copy;
+            Boolean repeated;
             Vertex(PayloadValue payloadValue, Payload payloadOfValue) {
                 this.payloadValue = payloadValue;
                 this.payloadOfValue = payloadOfValue;
-                visited = false;
-                removed = false;
-                copy = false;
+                this.visited = false;
+                this.removed = false;
+                this.copy = false;
+                this.repeated = false;
             }
             // equals and hashCode
             @Override
@@ -294,10 +300,12 @@ public abstract class Payload {
             Vertex v1;
             Vertex v2;
             String operation;
+            Boolean visited;
             Edge(Vertex v1, Vertex v2, String operation){
                 this.v1 = v1;
                 this.v2 = v2;
                 this.operation = operation;
+                this.visited = false;
             }
             // equals and hashCode
 
@@ -319,6 +327,7 @@ public abstract class Payload {
         private Payload rightestOperand;
         private String leftEventType;
         private String rightEventType;
+        private Map<Vertex, Deque<Vertex>> attrRepeats;
 
 
         public PayLoadUpdateGraph(){
@@ -329,6 +338,7 @@ public abstract class Payload {
             this.rightestOperand = null;
             this.leftEventType = null;
             this.rightEventType = null;
+            this.attrRepeats = new HashMap<>();
         }
 
         public Boolean notEmpty(){
@@ -363,7 +373,8 @@ public abstract class Payload {
                                    Map<Vertex, List<Vertex>> newAdjVertices,
                                    Map<Pair<Vertex,Vertex>, Edge> newEdges,
                                    Payload left, Payload right,
-                                   String leftEventType, String rightEventType){
+                                   String leftEventType, String rightEventType,
+                                   Map<Vertex, Deque<Vertex>> attrRepeats){
             this.vertices = newVertices;
             this.adjVertices = newAdjVertices;
             this.edges = newEdges;
@@ -371,6 +382,7 @@ public abstract class Payload {
             this.rightestOperand = right;
             this.leftEventType = leftEventType;
             this.rightEventType = rightEventType;
+            this.attrRepeats = attrRepeats;
         }
 
 
@@ -382,7 +394,20 @@ public abstract class Payload {
             }
             toAdd.copy = copy;
             vertices.add(toAdd);
-            Object result = adjVertices.putIfAbsent(toAdd, new ArrayList<>());
+            if(adjVertices.containsKey(toAdd)){
+                Vertex origin = new Vertex(payloadValue, payloadOfValue);
+                toAdd.payloadValue = new PayloadValue(new Pair(
+                        toAdd.payloadValue.NDvalue.getKey(),
+                        toAdd.payloadValue.NDvalue.getValue()));
+                Deque<Vertex> deq = this.attrRepeats.get(origin);
+                toAdd.repeated = true;
+                deq.addFirst(toAdd);
+            } else {
+                Deque<Vertex> newDeq = new LinkedList<>();
+                newDeq.push(toAdd);
+                this.attrRepeats.put(toAdd, newDeq);
+            }
+            this.adjVertices.put(toAdd, new ArrayList<>());
         }
         /*
         void removeVertex(Object payloadValue, Payload payloadOfValue) {
@@ -408,7 +433,8 @@ public abstract class Payload {
                     toReturn = v;
                 }
             }
-            return toReturn;
+            Vertex rightestVersion = this.attrRepeats.get(toReturn).getFirst();
+            return rightestVersion;
         }
 
         void addEdge(PayloadValue payloadValue1, Payload payloadOfValue1,
@@ -508,6 +534,7 @@ public abstract class Payload {
         private Boolean isBinary(String operation){
             switch (operation){
                 case "substract":
+                case "plus":
                     return true;
                 default:
                     return false;
@@ -518,11 +545,18 @@ public abstract class Payload {
         private Pair<Double, Double> evaluateBinaryOperation(Vertex v1, Vertex v2, String operation){
             switch(operation){
                 case "substract":
-
                     Double value1 = v1.payloadValue.NDvalue.getKey();
                     Double value2 = (v2.payloadValue).NDvalue.getKey();
                     Double result = value1 - value2;
                     result = (double)Math.round(result * 10000000000l) / 10000000000l;
+                    return new Pair(result,
+                            (v1.payloadValue).NDvalue.getValue() *
+                                    (v2.payloadValue).NDvalue.getValue());
+                case "plus":
+                    Double val1 = v1.payloadValue.NDvalue.getKey();
+                    Double val2 = (v2.payloadValue).NDvalue.getKey();
+                    Double res = val1 + val2;
+                    result = (double)Math.round(res * 10000000000l) / 10000000000l;
                     return new Pair(result,
                             (v1.payloadValue).NDvalue.getValue() *
                                     (v2.payloadValue).NDvalue.getValue());
@@ -555,7 +589,8 @@ public abstract class Payload {
 
         Double depthFirstTraversal(List<Pair<PayloadValue, Payload>> roots) {
             Set<Pair<PayloadValue, Payload>> visited = new LinkedHashSet<Pair<PayloadValue, Payload>>();
-            Stack<Vertex> stackOfVisited = new Stack<>();
+            Stack<Vertex> stackOfVisitedV = new Stack<>();
+            Stack<Edge> stackOfVisitedE = new Stack<>();
             Double result = new Double(0.0);
             for(Pair<PayloadValue, Payload> root : roots) {
                 Pair<Double,Double> firstValue = new Pair(0.0, 1.0);
@@ -569,9 +604,10 @@ public abstract class Payload {
                     }
                 }
                 if(rt.removed == true) continue;
-                stackOfVisited.push(rt);
-                result += depthFirstTraversalAux(rt, firstValue, secondValue, null, stackOfVisited);
-                stackOfVisited.pop();
+                stackOfVisitedV.push(rt);
+                result += depthFirstTraversalAux(rt, firstValue, secondValue,
+                        null, stackOfVisitedV, stackOfVisitedE);
+                stackOfVisitedV.pop();
 
             }
             for(Vertex v : adjVertices.keySet()){
@@ -580,6 +616,18 @@ public abstract class Payload {
                     v.removed = true;
                 }
             }
+            List<Pair> toRemove = new LinkedList<>();
+            for(Pair e : this.edges.keySet()){
+                Edge curE = this.edges.get(e);
+                if(curE.visited != true){
+                    toRemove.add(e);
+                }
+                this.edges.get(e).visited = false;
+            }
+            for(Pair e : toRemove){
+                this.edges.remove(e);
+            }
+
         return result;
         }
 
@@ -587,7 +635,8 @@ public abstract class Payload {
                                     Pair<Double, Double> firstValue,
                                     Pair<Double, Double> secondValue,
                                     String operation,
-                                    Stack<Vertex> stackOfVisited) {
+                                    Stack<Vertex> stackOfVisitedV,
+                                              Stack<Edge> stackOfVisitedE) {
             Double fResult = 0.0;
             boolean sink = true;
             List<Vertex> adjs = this.getAdjVertices(root.payloadValue, root.payloadOfValue);
@@ -596,11 +645,16 @@ public abstract class Payload {
                 if(adj == null || adj.removed == true || adj.payloadOfValue.contains(adj.payloadValue) == false) continue;
                 sink = false;
                 Edge e = edges.get(new Pair(root, adj));
+                if(e == null) continue;
                 if((operation != null) || operatinIsMain(e.operation)){
                     if(operatinIsMain(e.operation)){
-                        stackOfVisited.push(adj);
-                        fResult += depthFirstTraversalAux(adj, firstValue, secondValue, e.operation, stackOfVisited);
-                        stackOfVisited.pop();
+                        stackOfVisitedV.push(adj);
+                        stackOfVisitedE.push(e);
+                        fResult += depthFirstTraversalAux(adj, firstValue,
+                                secondValue, e.operation, stackOfVisitedV,
+                                stackOfVisitedE);
+                        stackOfVisitedV.pop();
+                        stackOfVisitedE.pop();
                     } else {
                         Pair<Double, Double> newSecondValue = null;
                         if(isBinary(e.operation)) {
@@ -611,9 +665,13 @@ public abstract class Payload {
                         } else if(isUnary(e.operation)){
                             newSecondValue = evaluateUnaryOperation(secondValue, e.operation);
                         }
-                        stackOfVisited.push(adj);
-                        fResult += depthFirstTraversalAux(adj, firstValue, newSecondValue, operation, stackOfVisited);
-                        stackOfVisited.pop();
+                        stackOfVisitedV.push(adj);
+                        stackOfVisitedE.push(e);
+                        fResult += depthFirstTraversalAux(adj, firstValue,
+                                newSecondValue, operation, stackOfVisitedV,
+                                stackOfVisitedE);
+                        stackOfVisitedV.pop();
+                        stackOfVisitedE.pop();
                     }
 
                 } else {
@@ -626,16 +684,23 @@ public abstract class Payload {
                     } else if(isUnary(e.operation)){
                         newFirstValue = evaluateUnaryOperation(firstValue, e.operation);
                     }
-                    stackOfVisited.push(adj);
-                    fResult += depthFirstTraversalAux(adj, newFirstValue, secondValue, operation, stackOfVisited);
-                    stackOfVisited.pop();
+                    stackOfVisitedV.push(adj);
+                    stackOfVisitedE.push(e);
+                    fResult += depthFirstTraversalAux(adj, newFirstValue,
+                            secondValue, operation, stackOfVisitedV,
+                            stackOfVisitedE);
+                    stackOfVisitedV.pop();
+                    stackOfVisitedE.pop();
                 }
             }
             if(sink == true){
                 if(operation == null) return 0.0;
                 if(evaluateMainOperation(firstValue,secondValue, operation) == true) {
-                    for(Vertex v : stackOfVisited){
+                    for(Vertex v : stackOfVisitedV){
                         v.visited = true;
+                    }
+                    for(Edge e : stackOfVisitedE){
+                        e.visited = true;
                     }
                     Double pathEvaluationResult = firstValue.getValue() *
                             secondValue.getValue();
@@ -694,7 +759,7 @@ public abstract class Payload {
             }
             return new PayLoadUpdateGraph(newVertices, newAdjVertices,
                     newEdges, this.leftestOperand, this.rightestOperand,
-                    this.leftEventType, this.rightEventType);
+                    this.leftEventType, this.rightEventType, this.attrRepeats);
         }
 
         Map<String, Map<Deque<Vertex>, List<Deque<Vertex>>>>
@@ -759,6 +824,9 @@ public abstract class Payload {
                 if(adj == null || adj.removed == true || adj.payloadOfValue.contains(adj.payloadValue) == false) continue;
                 sink = false;
                 Edge e = edges.get(new Pair(root, adj));
+                if(e == null || e.operation == null){
+                    continue;
+                }
                 if((operation != null) || operatinIsMain(e.operation)){
                     if(operatinIsMain(e.operation)){
                         Deque<Vertex> newStackOfVisited1 = new LinkedList<>((LinkedList)(stackOfVisited1));

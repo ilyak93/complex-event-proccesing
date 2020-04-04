@@ -74,7 +74,7 @@ public class DiscreteDistributionPayload extends Payload {
     public Boolean contains(Object o) {
         Payload.PayloadValue toFind = (Payload.PayloadValue) o;
         for(Pair<Double, Double> p : this.valuesProbabilities){
-            if(p.getKey() == toFind.NDvalue.getKey() && p.getValue() == toFind.NDvalue.getValue()) return true;
+            if(p.getKey() == toFind.getValue().getKey() && p.getValue() == toFind.getValue().getValue()) return true;
         }
         return false;
     }
