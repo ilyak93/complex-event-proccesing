@@ -144,11 +144,19 @@ public abstract class Payload {
                 newEventTypeName = leftEventTypeName;
             }
             Set<Deque<PayLoadUpdateGraph.Vertex>> updateKeys = newPaths.get(common).keySet();
-            Map<PayLoadUpdateGraph.Vertex, Boolean> update = new HashMap<>();
+            Map<PayLoadUpdateGraph.Vertex, Boolean> update1 = new HashMap<>();
+            for(Map<String, Deque<PayLoadUpdateGraph.Vertex>> path : allPaths1){
+                for(String keyName : path.keySet()) {
+                    for(PayLoadUpdateGraph.Vertex v : path.get(keyName)) {
+                        update1.put(v, true);
+                    }
+                }
+            }
+            Map<PayLoadUpdateGraph.Vertex, Boolean> update2 = new HashMap<>();
             for(Deque<PayLoadUpdateGraph.Vertex> key : updateKeys){
                 for(Deque<PayLoadUpdateGraph.Vertex> path : newPaths.get(common).get(key)) {
                     for(PayLoadUpdateGraph.Vertex v : path) {
-                        update.put(v, true);
+                        update2.put(v, true);
                     }
                 }
             }
@@ -156,34 +164,33 @@ public abstract class Payload {
             for(Map<String, Deque<PayLoadUpdateGraph.Vertex>> paths1 : allPaths1){
                 Map<Deque<PayLoadUpdateGraph.Vertex>,
                         List<Deque<PayLoadUpdateGraph.Vertex>>> pathsOfCommon = newPaths.get(common);
-                boolean toRemove = true;
                 for(Deque<PayLoadUpdateGraph.Vertex> path : pathsOfCommon.keySet()) {
                     if (path.equals(paths1.get(common))) {
-                        toRemove = false;
                         for(Deque<PayLoadUpdateGraph.Vertex> newPath :  pathsOfCommon.get(path)) {
                             for(PayLoadUpdateGraph.Vertex v : newPath) {
-                                update.put(v, false);
+                                update2.put(v, false);
                             }
                             Map<String, Deque<PayLoadUpdateGraph.Vertex>> newMap = new HashMap<>();
                             for (String oldEventType : paths1.keySet()) {
                                 newMap.put(oldEventType, paths1.get(oldEventType));
+                                for(PayLoadUpdateGraph.Vertex v : paths1.get(oldEventType)){
+                                    update1.put(v, false);
+                                }
                             }
                             newMap.put(newEventTypeName, newPath);
                             newList.add(newMap);
                         }
                     }
                 }
-                if(toRemove == true){
-                    for(String key : paths1.keySet()){
-                        for(PayLoadUpdateGraph.Vertex v: paths1.get(key)){
-                            v.payloadOfValue.updatePayload(v.payloadValue);
-                        }
-                    }
-                }
             }
 
-            for(PayLoadUpdateGraph.Vertex v : update.keySet()){
-                if(update.get(v) == true){
+            for(PayLoadUpdateGraph.Vertex v : update2.keySet()){
+                if(update2.get(v) == true){
+                    v.payloadOfValue.updatePayload(v.payloadValue);
+                }
+            }
+            for(PayLoadUpdateGraph.Vertex v : update1.keySet()){
+                if(update1.get(v) == true){
                     v.payloadOfValue.updatePayload(v.payloadValue);
                 }
             }
